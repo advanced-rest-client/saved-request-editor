@@ -42,6 +42,11 @@ The element fires `save-request` custom event when the user use "save" or
 "override" option in the UI. To react on a cancel event listen for
 `cancel-request-edit` event. Note that the event does not bubble.
 
+To edit a history item to save it in the saved request data store set the
+`is-history` attribute. It will always treat the request as a non saved object.
+Note that the `request` object set on `save-request` event won't be altered
+by this property. It may still contain the `_id` and `_rev` properties. 
+
 ### Example
 ```
 <saved-request-editor></saved-request-editor>
@@ -228,7 +233,9 @@ Custom property | Description | Default
         readOnly: true
       },
       // True when additional options are opened.
-      additionalOptionsOpened: Boolean
+      additionalOptionsOpened: Boolean,
+      // If set meaning it's editing a history item (to be saved)
+      isHistory: Boolean
     },
 
     // PouchDB's handler to the projects database.
@@ -504,10 +511,14 @@ Custom property | Description | Default
       if (!request) {
         return;
       }
+      var history = this.isHistory;
+      var isSaved = history ? false : !!request._id;
+      var isDrive = history ? false : !!request.driveId;
+
       this.set('name', request.name);
       this.set('description', request.description);
-      this.set('isSaved', !!request._id);
-      this.set('isDrive', !!request.driveId);
+      this.set('isSaved', isSaved);
+      this.set('isDrive', isDrive);
       this.set('projectId', request.legacyProject || undefined);
       if (!this.projectId) {
         this.set('projectName', '');

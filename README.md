@@ -19,6 +19,11 @@ The element fires `save-request` custom event when the user use "save" or
 "override" option in the UI. To react on a cancel event listen for
 `cancel-request-edit` event. Note that the event does not bubble.
 
+To edit a history item to save it in the saved request data store set the
+`is-history` attribute. It will always treat the request as a non saved object.
+Note that the `request` object set on `save-request` event won't be altered
+by this property. It may still contain the `_id` and `_rev` properties. 
+
 ### Example
 ```
 <saved-request-editor></saved-request-editor>
