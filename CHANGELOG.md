@@ -1,3 +1,13 @@
+<a name="0.1.4"></a>
+## [0.1.4](https://github.com/advanced-rest-client/saved-request-editor/compare/0.1.3...0.1.4) (2017-10-01)
+
+
+### New
+
+* Added resize notification when autogrow texarea changes height ([bd4a04194b0abaecd3ea7d9e20f6d502dd52ae99](https://github.com/advanced-rest-client/saved-request-editor/commit/bd4a04194b0abaecd3ea7d9e20f6d502dd52ae99))
+
+
+
 <a name="0.1.3"></a>
 ## [0.1.3](https://github.com/advanced-rest-client/saved-request-editor/compare/0.1.2...0.1.3) (2017-09-29)
 

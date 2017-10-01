@@ -22,7 +22,7 @@ The element fires `save-request` custom event when the user use "save" or
 To edit a history item to save it in the saved request data store set the
 `is-history` attribute. It will always treat the request as a non saved object.
 Note that the `request` object set on `save-request` event won't be altered
-by this property. It may still contain the `_id` and `_rev` properties. 
+by this property. It may still contain the `_id` and `_rev` properties.
 
 ### Example
 ```
