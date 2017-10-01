@@ -45,7 +45,7 @@ The element fires `save-request` custom event when the user use "save" or
 To edit a history item to save it in the saved request data store set the
 `is-history` attribute. It will always treat the request as a non saved object.
 Note that the `request` object set on `save-request` event won't be altered
-by this property. It may still contain the `_id` and `_rev` properties. 
+by this property. It may still contain the `_id` and `_rev` properties.
 
 ### Example
 ```
@@ -110,7 +110,7 @@ Custom property | Description | Default
     </style>
     <form is="iron-form" id="form" method="post" on-iron-form-presubmit="_formSubmit">
       <paper-input label="Request name (required)" required auto-validate error-message="Name is required" value="{{name}}"></paper-input>
-      <paper-textarea label="Description (optional)" value="{{description}}"></paper-textarea>
+      <paper-textarea id="autogrow" label="Description (optional)" value="{{description}}" on-bind-value-changed="_autogrowCheckResize"></paper-textarea>
       <paper-combobox label="Save in a project" value="{{projectName}}" source="[[_computeAutocomplete(projects)]]"></paper-combobox>
 
       <section class="additional-options">
@@ -522,6 +522,19 @@ Custom property | Description | Default
       this.set('projectId', request.legacyProject || undefined);
       if (!this.projectId) {
         this.set('projectName', '');
+      }
+    },
+    /**
+     * Notifies resize when the height of autogrow textarea changes.
+     */
+    _autogrowCheckResize: function() {
+      if (!this._lastAutogrowHeight) {
+        this._lastAutogrowHeight = this.$.autogrow.offsetHeight;
+        return;
+      }
+      if (this._lastAutogrowHeight !== this.$.autogrow.offsetHeight) {
+        this._lastAutogrowHeight = this.$.autogrow.offsetHeight;
+        this.notifyResize();
       }
     }
   });
