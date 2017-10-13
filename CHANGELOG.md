@@ -1,3 +1,13 @@
+<a name="0.1.8"></a>
+## [0.1.8](https://github.com/advanced-rest-client/saved-request-editor/compare/0.1.7...0.1.8) (2017-10-13)
+
+
+### Fix
+
+* Fixed project info cleanup when project doesn't exists anymore. ([da1e67d9f98d45fe4592d67f737b33c8e80ab581](https://github.com/advanced-rest-client/saved-request-editor/commit/da1e67d9f98d45fe4592d67f737b33c8e80ab581))
+
+
+
 <a name="0.1.7"></a>
 ## [0.1.7](https://github.com/advanced-rest-client/saved-request-editor/compare/0.1.6...0.1.7) (2017-10-09)
 
