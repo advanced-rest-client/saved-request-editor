@@ -73,21 +73,23 @@
 
         test('Computes projects autocomplete array', function(done) {
           const element = fixture('Basic');
-          setTimeout(() => {
+          element.addEventListener('iron-resize', function f() {
+            element.removeEventListener('iron-resize', f);
             const result = element._computeAutocomplete(element.projects);
             assert.lengthOf(result, 2);
             done();
-          }, 100);
+          });
         });
 
         test('projects are sorted', function(done) {
           const element = fixture('Basic');
-          setTimeout(() => {
+          element.addEventListener('iron-resize', function f() {
+            element.removeEventListener('iron-resize', f);
             const result = element._computeAutocomplete(element.projects);
             assert.equal(result[0], 'p2');
             assert.equal(result[1], 'p1');
             done();
-          }, 100);
+          });
         });
       });
 
@@ -122,7 +124,10 @@
         let element;
         setup((done) => {
           element = fixture('Basic');
-          setTimeout(() => done(), 100);
+          element.addEventListener('iron-resize', function f() {
+            element.removeEventListener('iron-resize', f);
+            done();
+          });
         });
 
         test('Sets name from request name', () => {
@@ -283,7 +288,8 @@
 
         test('Adds existing projects', function(done) {
           element = fixture('NewRequest');
-          setTimeout(() => {
+          element.addEventListener('iron-resize', function f() {
+            element.removeEventListener('iron-resize', f);
             element.selectedProjects = ['p1'];
             const result = element._computeEventDetail();
             assert.deepEqual(result.request, {
@@ -294,7 +300,7 @@
               projects: ['id-1']
             });
             done();
-          }, 25);
+          });
         });
 
         test('Adds not existing projects', function(done) {
@@ -309,13 +315,15 @@
 
         test('Adds both existing and non-existing projects', function(done) {
           element = fixture('NewRequest');
-          setTimeout(() => {
+
+          element.addEventListener('iron-resize', function f() {
+            element.removeEventListener('iron-resize', f);
             element.selectedProjects = ['p1', 'something'];
             const result = element._computeEventDetail();
             assert.deepEqual(result.request.projects, ['id-1']);
             assert.deepEqual(result.projects, ['something']);
             done();
-          }, 25);
+          });
         });
 
         test('Keeps _id and _rev when updating request', function(done) {
@@ -356,7 +364,8 @@
         let element;
         setup((done) => {
           element = fixture('ExistingRequest');
-          flush(() => {
+          element.addEventListener('iron-resize', function f() {
+            element.removeEventListener('iron-resize', f);
             element.name = 'test-name';
             element.selectedProjects = ['p1', 'something'];
             done();
