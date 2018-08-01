@@ -122,7 +122,7 @@
         let element;
         setup((done) => {
           element = fixture('Basic');
-          flush(() => done());
+          setTimeout(() => done(), 100);
         });
 
         test('Sets name from request name', () => {
