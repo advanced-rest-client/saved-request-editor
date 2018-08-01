@@ -101,20 +101,16 @@
     app._onSave = function(e) {
       const data = e.detail;
       let log = 'Request ';
-      if (data.override) {
+      if (data.request._id) {
         log += 'override. ';
       } else {
         log += 'save. ';
       }
-      if (data.isProject) {
-        log += 'Added to a project. ';
-        if (data.projectIsNew) {
-          log += 'Project is new. ';
-        } else {
-          log += 'Project already exists. ';
-        }
-      } else {
-        log += 'No project info. ';
+      if (data.projects) {
+        log += `Adding ${data.projects.length} new projects. `;
+      }
+      if (data.request.projects) {
+        log += `Has assigned ${data.request.projects.length} existing projects. `;
       }
       if (data.isDrive) {
         log += 'Saving request to the Drive. ';

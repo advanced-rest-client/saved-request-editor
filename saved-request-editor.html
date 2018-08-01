@@ -21,7 +21,7 @@ the License.
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-input/paper-textarea.html">
 <link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../paper-combobox/paper-combobox.html">
+<link rel="import" href="../paper-chip-input/paper-chip-input.html">
 <link rel="import" href="../iron-form/iron-form.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
@@ -86,6 +86,7 @@ Custom property | Description | Default
     .caption {
       @apply --layout-horizontal;
       @apply --layout-center;
+      cursor: pointer;
     }
 
     .options {
@@ -114,11 +115,11 @@ Custom property | Description | Default
       <form method="post">
         <paper-input label="Request name (required)" required auto-validate error-message="Name is required" value="{{name}}"></paper-input>
         <paper-textarea id="autogrow" label="Description (optional)" value="{{description}}" on-bind-value-changed="_autogrowCheckResize"></paper-textarea>
-        <paper-combobox label="Save in a project" value="{{projectName}}" source="[[_computeAutocomplete(projects)]]"></paper-combobox>
+        <paper-chip-input label="Add to project" value="{{selectedProjects}}" source="[[_computeAutocomplete(projects)]]" chip-remove-icon="arc:close"></paper-chip-input>
         <section class="additional-options">
-          <div class="caption">
+          <div class="caption" on-click="_toggleOptions">
             Additional options
-            <paper-icon-button icon="arc:arrow-drop-down" on-tap="_toggleOptions"></paper-icon-button>
+            <paper-icon-button icon="arc:arrow-drop-down"></paper-icon-button>
           </div>
           <iron-collapse opened="[[additionalOptionsOpened]]">
             <div class="options">
@@ -129,12 +130,14 @@ Custom property | Description | Default
       </form>
     </iron-form>
     <div class="actions">
-      <paper-button on-tap="_cancel" data-action="delete-request">cancel</paper-button>
+      <paper-button on-click="_cancel" data-action="delete-request" title="Cancels any changes">cancel</paper-button>
       <template is="dom-if" if="[[isSaved]]">
-        <paper-button on-tap="_save" data-action="save-as-new">Save as new</paper-button>
-        <paper-button class="action-button" on-tap="_override" data-action="override">Save</paper-button>
+        <paper-button on-click="_save" data-action="save-as-new" title="Saves request as new object">Save as new</paper-button>
+        <paper-button class="action-button" on-click="_override" data-action="override" title="Replaces request data">Update</paper-button>
       </template>
-      <paper-button class="action-button" on-tap="_save" data-action="save-request" hidden$="[[isSaved]]">Save</paper-button>
+      <template is="dom-if" if="[[!isSaved]]">
+        <paper-button class="action-button" on-click="_save" data-action="save-request" title="Commits changes and stores request in data store">Save</paper-button>
+      </template>
     </div>
   </template>
   <script>
@@ -152,7 +155,7 @@ Custom property | Description | Default
          */
         request: {
           type: Object,
-          observer: '_requestChanged'
+          observer: ''
         },
         /**
          * Name of the request.
@@ -168,40 +171,17 @@ Custom property | Description | Default
          */
         isSaved: {
           type: Boolean,
-          value: false
+          value: false,
+          computed: '_computeIsSaved(request)'
         },
         /**
          * True when saving request to Google Drive.
          */
         isDrive: Boolean,
         /**
-         * List of available projects
+         * List of available projects.
          */
-        projects: {
-          type: Array,
-          observer: '_ensureComboClosed'
-        },
-        /**
-         * Name of the project entered into the combo box selector.
-         */
-        projectName: {
-          type: String,
-          observer: '_assertProjectId'
-        },
-        /**
-         * Computed value, true if the project already exists so entered value
-         * represents a name of already saved project.
-         * Use `this.projectId` to get project `_id` property for selected name
-         */
-        projectIsNew: {
-          type: Boolean,
-          computed: '_computeProjectIsNew(projects.*, projectName)'
-        },
-        /**
-         * Selected project ID. Should be set if the request has been already
-         * associated with a project.
-         */
-        projectId: String,
+        projects: Array,
         /**
          * Set if the user chooses to override current request.
          */
@@ -211,15 +191,17 @@ Custom property | Description | Default
         },
         // True when additional options are opened.
         additionalOptionsOpened: Boolean,
-        // If set meaning it's editing a history item (to be saved)
-        isHistory: Boolean
+        /**
+         * List of selected in the dialog project names.
+         * @type {Array<String>}
+         */
+        selectedProjects: Array
       };
     }
 
     static get observers() {
       return [
-        '_computeProjectName(projectId, projects.*)',
-        '_projectIsNewChanged(projectIsNew, projectName)'
+        '_requestChanged(request, projects)'
       ];
     }
 
@@ -237,7 +219,7 @@ Custom property | Description | Default
       window.addEventListener('project-object-deleted', this._projectDataChanged);
       window.addEventListener('datastore-destroyed', this._datastoreDestroyed);
       window.addEventListener('data-imported', this._projectDataChanged);
-      this._refreshNext();
+      this._refreshProjectsList();
     }
 
     disconnectedCallback() {
@@ -249,22 +231,6 @@ Custom property | Description | Default
     }
 
     /**
-     * Selected project database info
-     */
-    get projectInfo() {
-      const projects = this.projects;
-      if (!projects || !projects.length) {
-        return;
-      }
-      let projectName = this.projectName;
-      if (!projectName) {
-        return;
-      }
-      projectName = projectName.toLowerCase();
-      return projects.find((item) => item.name.toLowerCase() === projectName);
-    }
-
-    /**
      * Updates the list of projects when project object changed.
      *
      * @param {CustomEvent} e
@@ -273,7 +239,7 @@ Custom property | Description | Default
       if (e.cancelable) {
         return;
       }
-      this._refreshNext();
+      this._refreshProjectsList();
     }
     /**
      * Updates the list of projects when project datastore has been destroyed.
@@ -291,12 +257,12 @@ Custom property | Description | Default
         }
       }
       this.set('projects', undefined);
-      this._refreshNext();
+      this._refreshProjectsList();
     }
     /**
      * Refreshes the list of projects after next render frame.
      */
-    _refreshNext() {
+    _refreshProjectsList() {
       Polymer.RenderStatus.afterNextRender(this, () => this._updateProjectsList());
     }
 
@@ -304,11 +270,10 @@ Custom property | Description | Default
      * Resets the state of the UI
      */
     reset() {
-      this.isSaved = false;
       this.isDrive = false;
       this.name = '';
-      this.projectName = '';
-      this.set('projects', []);
+      this.description = '';
+      this.set('selectedProjects', []);
     }
     /**
      * Sends the `cancel-request-edit` custom event to cancel the edit.
@@ -396,23 +361,12 @@ Custom property | Description | Default
       return projects.map((item) => item.name);
     }
     /**
-     * Computes if currently entered project name already exists in the
-     * datastore.
-     * @return {Boolean} True if current `projectName` is not associated with
-     * any of the existing projects.
-     */
-    _computeProjectIsNew() {
-      return !this.projectInfo;
-    }
-    /**
      * Sends the `save-request` custom event with computed detail object.
      */
     _formSubmit(e) {
       e.preventDefault();
       const detail = this._computeEventDetail();
-      if (detail.isProject && !detail.projectId && !detail.projectName) {
-        return;
-      }
+
       this.dispatchEvent(new CustomEvent('save-request', {
         bubbles: true,
         composed: true,
@@ -425,97 +379,91 @@ Custom property | Description | Default
      * @return {Object} A detail property of the event.
      */
     _computeEventDetail() {
-      const detail = {
-        name: this.name,
-        override: this.override,
-        isDrive: this.isDrive,
-        isProject: !!(this.projectName || this.projectId)
-      };
+      const storeRequest = Object.assign({}, this.request);
+      storeRequest.name = this.name;
       if (this.description) {
-        detail.description = this.description;
+        storeRequest.description = this.description;
       }
-      if (detail.isProject) {
-        if (this.projectIsNew || !this.projects) {
-          detail.projectName = this.projectName;
-          detail.projectIsNew = true;
-        } else {
-          detail.projectId = this.projectId;
-          detail.projectIsNew = false;
+      if (!this.override && storeRequest._id) {
+        delete storeRequest._id;
+        delete storeRequest._rev;
+      }
+      const storeProjects = [];
+      const selectedProjects = this.selectedProjects;
+      const projects = this.projects || [];
+      const projectsLength = projects.length;
+      storeRequest.projects = [];
+      if (selectedProjects && selectedProjects.length) {
+        for (let i = 0, len = selectedProjects.length; i < len; i++) {
+          const selected = selectedProjects[i];
+          if (!selected) {
+            continue;
+          }
+          const lowerSelected = selected.toLowerCase();
+          let hasProject = false;
+          for (let j = 0; j < projectsLength; j++) {
+            if (projects[j].name.toLowerCase() === lowerSelected) {
+              storeRequest.projects.push(projects[j]._id);
+              hasProject = true;
+              break;
+            }
+          }
+          if (!hasProject) {
+            storeProjects.push(selected);
+          }
         }
       }
-      if (this.request) {
-        detail.request = this.request;
-      }
-      return detail;
-    }
-    /**
-     * Function used to compute project name when projectId changes.
-     * It is used when project ID changes from the outside of the element to
-     * indicate that the existing request already belongs to a project.
-     */
-    _computeProjectName(projectId, projectsRecord) {
-      if (!projectId || !projectsRecord || !projectsRecord.base) {
-        return;
-      }
-      const project = projectsRecord.base.find((item) => item._id === projectId);
-      if (!project) {
-        // Project doesn't exists anymore.
-        this.set('projectId', undefined);
-        return;
-      }
-      if (this.projectName !== project.name) {
-        this.set('projectName', project.name);
-      }
-    }
-    // Computes `projectId` property when `projectIsNew` changes.
-    _projectIsNewChanged(projectIsNew) {
-      if (projectIsNew) {
-        return;
-      }
-      const info = this.projectInfo;
-      if (!info) {
-        this.set('projectId', undefined);
-        return;
-      }
-      this.set('projectId', info._id);
-    }
-    /**
-     * The `IronOverlayBehavior` focuses of the combobox (which is using
-     * `IronOverlayBehavior` as well in paper-autocomplete element) and it
-     * opend the autocomplete. This closes the autocomplete after the `source`
-     * property change (projects list). I wasn't able to determine how not to
-     * focus on the element when the overlay is opened. This is simple
-     * walkaround.
-     */
-    _ensureComboClosed(projects) {
-      if (projects && projects.length) {
-        setTimeout(() => {
-          const combo = this.shadowRoot.querySelector('paper-combobox');
-          combo.opened = false;
-          combo.blur();
-        }, 1);
-      }
+      const storeOptions = {
+        isDrive: this.isDrive
+      };
+      return {
+        request: storeRequest,
+        projects: storeProjects.length ? storeProjects : undefined,
+        options: storeOptions
+      };
     }
 
     _toggleOptions() {
       this.additionalOptionsOpened = !this.additionalOptionsOpened;
     }
 
-    _requestChanged(request) {
+    _computeIsSaved(request) {
+      const history = !!(request && request.type === 'history');
+      return history ? false : !!request._id;
+    }
+
+    _requestChanged(request, projects) {
       if (!request) {
         return;
       }
       const history = this.isHistory || request.type === 'history';
-      const isSaved = history ? false : !!request._id;
       const isDrive = history ? false : !!request.driveId;
 
-      this.set('name', request.name);
-      this.set('description', request.description);
-      this.set('isSaved', isSaved);
+      this.set('name', request.name || '');
+      this.set('description', request.description || '');
       this.set('isDrive', isDrive);
-      this.set('projectId', request.legacyProject || undefined);
-      if (!this.projectId) {
-        this.set('projectName', '');
+      let projectIds = [];
+      if (request.legacyProject) {
+        projectIds[projectIds.length] = request.legacyProject;
+      }
+      if (request.projects) {
+        projectIds = projectIds.concat(request.projects);
+      }
+      const projectsLen = (projects && projects.length);
+      if (projectsLen) {
+        let projectsData = [];
+        projectIds.forEach((id) => {
+          for (let i = 0; i < projectsLen; i++) {
+            if (projects[i]._id === id) {
+              projectsData[projectsData.length] = projects[i].name;
+              return;
+            }
+          }
+          projectsData[projectsData.length] = id;
+        });
+        this.set('selectedProjects', projectsData.length ? projectsData : undefined);
+      } else {
+        this.set('selectedProjects', projectIds.length ? projectIds : undefined);
       }
     }
     /**
@@ -532,15 +480,6 @@ Custom property | Description | Default
       }
     }
 
-    _assertProjectId(projectName) {
-      if (!projectName) {
-        // project reference has been removed.
-        if (this.projectId) {
-          this.projectId = undefined;
-        }
-      }
-    }
-
     /**
      * Fired when the user cancels the editor.
      * @event cancel-request-edit
@@ -550,21 +489,15 @@ Custom property | Description | Default
      * Fire when the user saves the request.
      *
      * @event save-request
-     * @param {String} name Required, request name
-     * @param {String} description Optional, request description
-     * @param {Boolean} override Required, `true` if already saved object and
-     * user accepted to override the data.
-     * @param {Boolean} isDrive Required,
-     * @param {Boolean} isProject Required,
-     * @param {Boolean} projectIsNew Required if `isProject` is true. True if
-     * the project do not exists in the datastore. In this case `projectName` is set.
-     * Otherwise `projectId` is set.
-     * @param {String} projectName Optional, only if `projectIsNew` is `true`.
-     * Name of the project to create.
-     * @param {String} projectId Optional, only if `projectIsNew` is `false`.
-     * The ID of existing project that should be associated with the request.
-     * @param {Object} request Optional, the `request` property if it was set
-     * with the editor.
+     * @param {Object} request ArcRequest object with request data.
+     * It is the copy of object assigned to `request` property.
+     * If the user choose to save request as new object it's `_id` and `_rev`
+     * properties are removed.
+     * @param {?Array<String>} projects Optional list of new projects to create
+     * with this request. It contains user entered names.
+     * @param {Object} options Store options:
+     * - isDrive {Boolean} If true then the request should be saved to Google
+     * Drive as well.
      */
   }
   window.customElements.define(SavedRequestEditor.is, SavedRequestEditor);
