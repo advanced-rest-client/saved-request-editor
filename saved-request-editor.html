@@ -256,7 +256,6 @@ the License.
      */
     _cancel() {
       this.dispatchEvent(new CustomEvent('cancel-request-edit', {
-        bubbles: false,
         composed: true
       }));
     }
