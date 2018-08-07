@@ -143,7 +143,7 @@ Custom property | Description | Default
   <script>
   class SavedRequestEditor extends
     Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element) {
-    static get is() { return 'saved-request-editor'; }
+    static get is() {return 'saved-request-editor';}
     static get properties() {
       return {
         /**
@@ -350,6 +350,8 @@ Custom property | Description | Default
      * Computes a list of suggestion for autocomplete element.
      * From the list of `projects` it takes names for each project and returns
      * new list for suggestions.
+     * @param {Array<Object>} projects
+     * @return {Array<String>}
      */
     _computeAutocomplete(projects) {
       if (!projects || !projects.length) {
@@ -359,6 +361,8 @@ Custom property | Description | Default
     }
     /**
      * Sends the `save-request` custom event with computed detail object.
+     *
+     * @param {CustomEvent} e
      */
     _formSubmit(e) {
       e.preventDefault();
