@@ -414,7 +414,7 @@ the License.
         return false;
       }
       const history = !!(request && request.type === 'history');
-      return history ? false : !!request._id;
+      return history ? false : !!request._rev;
     }
 
     _requestChanged(request, projects) {

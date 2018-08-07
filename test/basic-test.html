@@ -192,21 +192,21 @@
           assert.equal(element.selectedProjects[0], 'p1');
         });
 
-        test('isSaved is false when no id', function() {
+        test('isSaved is false when no rev', function() {
           element.request = {};
           assert.isFalse(element.isSaved);
         });
 
         test('isSaved is true when id', function() {
           element.request = {
-            _id: 'test'
+            _rev: 'test'
           };
           assert.isTrue(element.isSaved);
         });
 
         test('isSaved is always false for history item', function() {
           element.request = {
-            _id: 'test',
+            _rev: 'test',
             type: 'history'
           };
           assert.isFalse(element.isSaved);
@@ -214,7 +214,7 @@
 
         test('Renders override button for saved request', (done) => {
           element.request = {
-            _id: 'test'
+            _rev: 'test'
           };
           flush(() => {
             const node = getActionItem(element, 'override');
@@ -225,7 +225,7 @@
 
         test('Renders save as new button for saved request', (done) => {
           element.request = {
-            _id: 'test'
+            _rev: 'test'
           };
           flush(() => {
             const node = getActionItem(element, 'save-as-new');
