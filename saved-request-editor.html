@@ -92,7 +92,7 @@ the License.
       </form>
     </iron-form>
     <div class="actions">
-      <paper-button on-click="_cancel" data-action="delete-request" title="Cancels any changes">cancel</paper-button>
+      <paper-button on-click="_cancel" data-action="cancel-edit" title="Cancels any changes">cancel</paper-button>
       <template is="dom-if" if="[[isSaved]]">
         <paper-button on-click="_save" data-action="save-as-new" title="Saves request as new object">Save as new</paper-button>
         <paper-button class="action-button" on-click="_override" data-action="override" title="Replaces request data">Update</paper-button>
