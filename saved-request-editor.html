@@ -416,6 +416,9 @@ Custom property | Description | Default
       const storeOptions = {
         isDrive: this.isDrive
       };
+      if (!this.isDrive && storeRequest.driveId) {
+        delete storeRequest.driveId;
+      }
       return {
         request: storeRequest,
         projects: storeProjects.length ? storeProjects : undefined,
