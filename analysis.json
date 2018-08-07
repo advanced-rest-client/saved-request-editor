@@ -1,0 +1,801 @@
+{
+  "schema_version": "1.0.0",
+  "elements": [
+    {
+      "description": "A dialog to edit request meta data.\n\n### Styling\n\n`<saved-request-editor>` provides the following custom properties and mixins\nfor styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--saved-request-editor` | Mixin applied to the element | `{}`",
+      "summary": "",
+      "path": "saved-request-editor.html",
+      "properties": [
+        {
+          "name": "request",
+          "type": "Object | null | undefined",
+          "description": "The request object to be saved / updated in the datastore.\nIt's not required for the editor to work.\nThis object will be attached to `save-request` object as a reference.\nWhen this object change it computes values for `name`, `isSaved`,\n`isDrive`, `projectName` and `projectId` properties.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 134,
+              "column": 8
+            },
+            "end": {
+              "line": 134,
+              "column": 23
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Object"
+            }
+          }
+        },
+        {
+          "name": "name",
+          "type": "string | null | undefined",
+          "description": "Name of the request.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 138,
+              "column": 8
+            },
+            "end": {
+              "line": 138,
+              "column": 20
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          }
+        },
+        {
+          "name": "description",
+          "type": "string | null | undefined",
+          "description": "Request description.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 142,
+              "column": 8
+            },
+            "end": {
+              "line": 142,
+              "column": 27
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          }
+        },
+        {
+          "name": "isSaved",
+          "type": "boolean | null | undefined",
+          "description": "Should be set if the request has been already saved in the datastore.\nAdds UI controls to override or save as new.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 147,
+              "column": 8
+            },
+            "end": {
+              "line": 151,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "readOnly": true,
+              "attributeType": "Boolean"
+            }
+          },
+          "defaultValue": "false"
+        },
+        {
+          "name": "isDrive",
+          "type": "boolean | null | undefined",
+          "description": "True when saving request to Google Drive.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 155,
+              "column": 8
+            },
+            "end": {
+              "line": 155,
+              "column": 24
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Boolean"
+            }
+          }
+        },
+        {
+          "name": "projects",
+          "type": "Array | null | undefined",
+          "description": "List of available projects.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 159,
+              "column": 8
+            },
+            "end": {
+              "line": 159,
+              "column": 23
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        },
+        {
+          "name": "override",
+          "type": "boolean | null | undefined",
+          "description": "Set if the user chooses to override current request.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 163,
+              "column": 8
+            },
+            "end": {
+              "line": 166,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "readOnly": true,
+              "attributeType": "Boolean"
+            }
+          }
+        },
+        {
+          "name": "additionalOptionsOpened",
+          "type": "boolean | null | undefined",
+          "description": "True when additional options are opened.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 168,
+              "column": 8
+            },
+            "end": {
+              "line": 168,
+              "column": 40
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Boolean"
+            }
+          }
+        },
+        {
+          "name": "selectedProjects",
+          "type": "Array.<String>",
+          "description": "List of selected in the dialog project names.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 173,
+              "column": 8
+            },
+            "end": {
+              "line": 173,
+              "column": 31
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 189,
+              "column": 4
+            },
+            "end": {
+              "line": 198,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "disconnectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 200,
+              "column": 4
+            },
+            "end": {
+              "line": 206,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_projectDataChanged",
+          "description": "Updates the list of projects when project object changed.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 213,
+              "column": 4
+            },
+            "end": {
+              "line": 218,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_datastoreDestroyed",
+          "description": "Updates the list of projects when project datastore has been destroyed.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 223,
+              "column": 4
+            },
+            "end": {
+              "line": 236,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_refreshProjectsList",
+          "description": "Refreshes the list of projects after next render frame.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 240,
+              "column": 4
+            },
+            "end": {
+              "line": 242,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "reset",
+          "description": "Resets the state of the UI",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 247,
+              "column": 4
+            },
+            "end": {
+              "line": 252,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_cancel",
+          "description": "Sends the `cancel-request-edit` custom event to cancel the edit.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 256,
+              "column": 4
+            },
+            "end": {
+              "line": 261,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_save",
+          "description": "Sets `override` to `false` and sends the form.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 265,
+              "column": 4
+            },
+            "end": {
+              "line": 268,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_override",
+          "description": "Sets `override` to `true` and sends the form.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 272,
+              "column": 4
+            },
+            "end": {
+              "line": 275,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_sendForm",
+          "description": "Validates and submits the form.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 277,
+              "column": 4
+            },
+            "end": {
+              "line": 282,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_updateProjectsList",
+          "description": "Updates list of available projects after the overlay is opened.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 284,
+              "column": 4
+            },
+            "end": {
+              "line": 314,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "_projectsSortFn",
+          "description": "Sort function used to sort projects in order.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 316,
+              "column": 4
+            },
+            "end": {
+              "line": 326,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "a"
+            },
+            {
+              "name": "b"
+            }
+          ]
+        },
+        {
+          "name": "_computeAutocomplete",
+          "description": "Computes a list of suggestion for autocomplete element.\nFrom the list of `projects` it takes names for each project and returns\nnew list for suggestions.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 334,
+              "column": 4
+            },
+            "end": {
+              "line": 339,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "projects",
+              "type": "Array.<Object>"
+            }
+          ],
+          "return": {
+            "type": "Array.<String>"
+          }
+        },
+        {
+          "name": "_formSubmit",
+          "description": "Sends the `save-request` custom event with computed detail object.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 345,
+              "column": 4
+            },
+            "end": {
+              "line": 355,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_computeEventDetail",
+          "description": "Computes `save-request` custom event's `detail` object",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 360,
+              "column": 4
+            },
+            "end": {
+              "line": 406,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "Object",
+            "desc": "A detail property of the event."
+          }
+        },
+        {
+          "name": "_toggleOptions",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 408,
+              "column": 4
+            },
+            "end": {
+              "line": 410,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_computeIsSaved",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 412,
+              "column": 4
+            },
+            "end": {
+              "line": 418,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "request"
+            }
+          ]
+        },
+        {
+          "name": "_requestChanged",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 420,
+              "column": 4
+            },
+            "end": {
+              "line": 454,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "request"
+            },
+            {
+              "name": "projects"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_autogrowCheckResize",
+          "description": "Notifies resize when the height of autogrow textarea changes.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 458,
+              "column": 4
+            },
+            "end": {
+              "line": 467,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 122,
+          "column": 2
+        },
+        "end": {
+          "line": 488,
+          "column": 3
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "UiElements.SavedRequestEditor",
+      "attributes": [
+        {
+          "name": "request",
+          "description": "The request object to be saved / updated in the datastore.\nIt's not required for the editor to work.\nThis object will be attached to `save-request` object as a reference.\nWhen this object change it computes values for `name`, `isSaved`,\n`isDrive`, `projectName` and `projectId` properties.",
+          "sourceRange": {
+            "start": {
+              "line": 134,
+              "column": 8
+            },
+            "end": {
+              "line": 134,
+              "column": 23
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "name",
+          "description": "Name of the request.",
+          "sourceRange": {
+            "start": {
+              "line": 138,
+              "column": 8
+            },
+            "end": {
+              "line": 138,
+              "column": 20
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "description",
+          "description": "Request description.",
+          "sourceRange": {
+            "start": {
+              "line": 142,
+              "column": 8
+            },
+            "end": {
+              "line": 142,
+              "column": 27
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "is-saved",
+          "description": "Should be set if the request has been already saved in the datastore.\nAdds UI controls to override or save as new.",
+          "sourceRange": {
+            "start": {
+              "line": 147,
+              "column": 8
+            },
+            "end": {
+              "line": 151,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "is-drive",
+          "description": "True when saving request to Google Drive.",
+          "sourceRange": {
+            "start": {
+              "line": 155,
+              "column": 8
+            },
+            "end": {
+              "line": 155,
+              "column": 24
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "projects",
+          "description": "List of available projects.",
+          "sourceRange": {
+            "start": {
+              "line": 159,
+              "column": 8
+            },
+            "end": {
+              "line": 159,
+              "column": 23
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined"
+        },
+        {
+          "name": "override",
+          "description": "Set if the user chooses to override current request.",
+          "sourceRange": {
+            "start": {
+              "line": 163,
+              "column": 8
+            },
+            "end": {
+              "line": 166,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "additional-options-opened",
+          "description": "True when additional options are opened.",
+          "sourceRange": {
+            "start": {
+              "line": 168,
+              "column": 8
+            },
+            "end": {
+              "line": 168,
+              "column": 40
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "selected-projects",
+          "description": "List of selected in the dialog project names.",
+          "sourceRange": {
+            "start": {
+              "line": 173,
+              "column": 8
+            },
+            "end": {
+              "line": 173,
+              "column": 31
+            }
+          },
+          "metadata": {},
+          "type": "Array.<String>"
+        }
+      ],
+      "events": [
+        {
+          "type": "CustomEvent",
+          "name": "cancel-request-edit",
+          "description": "Fired when the user cancels the editor.",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "save-request",
+          "description": "Fire when the user saves the request.",
+          "metadata": {}
+        }
+      ],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "saved-request-editor",
+      "mixins": [
+        "Polymer.IronResizableBehavior"
+      ]
+    }
+  ]
+}
