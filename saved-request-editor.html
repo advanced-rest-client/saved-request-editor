@@ -431,12 +431,16 @@ Custom property | Description | Default
     }
 
     _computeIsSaved(request) {
+      if (!request) {
+        return false;
+      }
       const history = !!(request && request.type === 'history');
       return history ? false : !!request._id;
     }
 
     _requestChanged(request, projects) {
       if (!request) {
+        this.reset();
         return;
       }
       const history = this.isHistory || request.type === 'history';
