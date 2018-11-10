@@ -27,6 +27,12 @@
       </template>
     </test-fixture>
 
+    <test-fixture id="DriveSaved">
+      <template>
+        <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test","_id":"test-id","_rev":"test-rev","type":"saved","driveId":"testDriveId"}' name="test-name" description="test-description"></saved-request-editor>
+      </template>
+    </test-fixture>
+
     <script>
     suite('saved-request-editor', function() {
       function projectsRequestHandler(e) {
@@ -337,6 +343,17 @@
             done();
           });
         });
+
+        test('Removes driveId from the request', function(done) {
+          element = fixture('DriveSaved');
+          flush(() => {
+            element._setOverride(false);
+            element.isDrive = false;
+            const result = element._computeEventDetail();
+            assert.isUndefined(result.request.driveId);
+            done();
+          });
+        });
       });
 
       suite('save-request event dispatch', function() {
@@ -404,6 +421,54 @@
           });
           const node = getActionItem(element, 'save-as-new');
           node.click();
+        });
+      });
+
+      suite('_computeIsSaved()', () => {
+        let element;
+        setup(() => {
+          element = fixture('Basic');
+        });
+
+        test('Returns false when no argument', () => {
+          const result = element._computeIsSaved();
+          assert.isFalse(result);
+        });
+
+        test('Returns false when type is history', () => {
+          const result = element._computeIsSaved({
+            type: 'history'
+          });
+          assert.isFalse(result);
+        });
+
+        test('Returns false when _rev is not set', () => {
+          const result = element._computeIsSaved({
+            type: 'saved'
+          });
+          assert.isFalse(result);
+        });
+
+        test('Returns true when _rev is set', () => {
+          const result = element._computeIsSaved({
+            type: 'saved',
+            _rev: 'test'
+          });
+          assert.isTrue(result);
+        });
+      });
+
+      suite('_cancel()', () => {
+        let element;
+        setup(() => {
+          element = fixture('Basic');
+        });
+
+        test('Dispatches "cancel-request-edit" event', () => {
+          const spy = sinon.spy();
+          element.addEventListener('cancel-request-edit', spy);
+          element._cancel();
+          assert.isTrue(spy.called);
         });
       });
     });

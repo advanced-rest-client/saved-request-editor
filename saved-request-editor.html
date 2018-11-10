@@ -271,7 +271,11 @@ the License.
     _toggleOptions() {
       this.additionalOptionsOpened = !this.additionalOptionsOpened;
     }
-
+    /**
+     * Computes value for `isSaved` property.
+     * @param {?Object} request Request object assigned to the `request`
+     * @return {Boolean}
+     */
     _computeIsSaved(request) {
       if (!request) {
         return false;
