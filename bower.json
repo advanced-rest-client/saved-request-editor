@@ -28,7 +28,8 @@
     "iron-form": "PolymerElements/iron-form#^2.0.0",
     "iron-collapse": "PolymerElements/iron-collapse#^2.0.0",
     "arc-icons": "advanced-rest-client/arc-icons#^2.0.0",
-    "paper-icon-button": "PolymerElements/paper-icon-button#^2.0.0"
+    "paper-icon-button": "PolymerElements/paper-icon-button#^2.0.0",
+    "projects-list-consumer-mixin": "advanced-rest-client/projects-list-consumer-mixin#2.0.0-preview"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^3.0.1",

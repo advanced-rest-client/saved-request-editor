@@ -26,7 +26,7 @@ the License.
 <link rel="import" href="../iron-collapse/iron-collapse.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../arc-icons/arc-icons.html">
-
+<link rel="import" href="../projects-list-consumer-mixin/projects-list-consumer-mixin.html">
 <dom-module id="saved-request-editor">
   <template>
     <style>
@@ -77,7 +77,7 @@ the License.
       <form method="post">
         <paper-input label="Request name (required)" required auto-validate error-message="Name is required" value="{{name}}"></paper-input>
         <paper-textarea id="autogrow" label="Description (optional)" value="{{description}}" on-bind-value-changed="_autogrowCheckResize"></paper-textarea>
-        <paper-chip-input label="Add to project" value="{{selectedProjects}}" source="[[_computeAutocomplete(projects)]]" chip-remove-icon="arc:close"></paper-chip-input>
+        <paper-chip-input label="Add to project" value="{{selectedProjects}}" source="[[_computeProjectsAutocomplete(projects)]]" chip-remove-icon="arc:close"></paper-chip-input>
         <section class="additional-options">
           <div class="caption" on-click="_toggleOptions">
             Additional options
@@ -119,9 +119,11 @@ the License.
    * @customElement
    * @memberof UiElements
    * @appliesMixin Polymer.IronResizableBehavior
+   * @appliesMixin ArcComponents.ProjectsListConsumerMixin
    */
   class SavedRequestEditor extends
-    Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element) {
+    ArcComponents.ProjectsListConsumerMixin(
+      Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)) {
     static get is() {return 'saved-request-editor';}
     static get properties() {
       return {
@@ -155,10 +157,6 @@ the License.
          */
         isDrive: Boolean,
         /**
-         * List of available projects.
-         */
-        projects: Array,
-        /**
          * Set if the user chooses to override current request.
          */
         override: {
@@ -181,67 +179,11 @@ the License.
       ];
     }
 
-    constructor() {
-      super();
-      this._projectDataChanged = this._projectDataChanged.bind(this);
-      this._datastoreDestroyed = this._datastoreDestroyed.bind(this);
-    }
-
     connectedCallback() {
       super.connectedCallback();
       this._ensureAttribute('tabindex', -1);
       this._ensureAttribute('role', 'dialog');
-      window.addEventListener('project-object-changed', this._projectDataChanged);
-      window.addEventListener('project-object-deleted', this._projectDataChanged);
-      window.addEventListener('datastore-destroyed', this._datastoreDestroyed);
-      window.addEventListener('data-imported', this._projectDataChanged);
-      this._refreshProjectsList();
     }
-
-    disconnectedCallback() {
-      super.disconnectedCallback();
-      window.removeEventListener('project-object-changed', this._projectDataChanged);
-      window.removeEventListener('project-object-deleted', this._projectDataChanged);
-      window.removeEventListener('datastore-destroyed', this._datastoreDestroyed);
-      window.removeEventListener('data-imported', this._projectDataChanged);
-    }
-
-    /**
-     * Updates the list of projects when project object changed.
-     *
-     * @param {CustomEvent} e
-     */
-    _projectDataChanged(e) {
-      if (e.cancelable) {
-        return;
-      }
-      this._refreshProjectsList();
-    }
-    /**
-     * Updates the list of projects when project datastore has been destroyed.
-     * @param {CustomEvent} e
-     */
-    _datastoreDestroyed(e) {
-      const store = e.detail.datastore;
-      if (typeof store === 'string') {
-        if (store !== 'legacy-projects') {
-          return;
-        }
-      } else {
-        if (store.indexOf('legacy-projects') === -1) {
-          return;
-        }
-      }
-      this.set('projects', undefined);
-      this._refreshProjectsList();
-    }
-    /**
-     * Refreshes the list of projects after next render frame.
-     */
-    _refreshProjectsList() {
-      Polymer.RenderStatus.afterNextRender(this, () => this._updateProjectsList());
-    }
-
     /**
      * Resets the state of the UI
      */
@@ -280,63 +222,6 @@ the License.
       }
       this.$.form.submit();
     }
-    // Updates list of available projects after the overlay is opened.
-    _updateProjectsList() {
-      const e = new CustomEvent('project-model-query', {
-        bubbles: true,
-        composed: true,
-        cancelable: true,
-        detail: {}
-      });
-      this.dispatchEvent(e);
-      if (!e.defaultPrevented) {
-        console.warn('The project-model is not in the DOM.');
-        return;
-      }
-      return e.detail.result
-      .then((result) => result.sort(this._projectsSortFn))
-      .then((result) => {
-        this.set('projects', result);
-        Polymer.RenderStatus.afterNextRender(this, () => this.notifyResize());
-      })
-      .catch((cause) => {
-        this.dispatchEvent(new CustomEvent('send-analytics', {
-          bubbles: true,
-          composed: true,
-          detail: {
-            type: 'exception',
-            description: 'save-dialog-view:' + cause.message,
-            fatal: false
-          }
-        }));
-        throw cause;
-      });
-    }
-    // Sort function used to sort projects in order.
-    _projectsSortFn(a, b) {
-      if (a.order === b.order) {
-        return 0;
-      }
-      if (a.order > b.order) {
-        return 1;
-      }
-      if (a.order < b.order) {
-        return -1;
-      }
-    }
-    /**
-     * Computes a list of suggestion for autocomplete element.
-     * From the list of `projects` it takes names for each project and returns
-     * new list for suggestions.
-     * @param {Array<Object>} projects
-     * @return {Array<String>}
-     */
-    _computeAutocomplete(projects) {
-      if (!projects || !projects.length) {
-        return;
-      }
-      return projects.map((item) => item.name);
-    }
     /**
      * Sends the `save-request` custom event with computed detail object.
      *
@@ -367,31 +252,9 @@ the License.
         delete storeRequest._id;
         delete storeRequest._rev;
       }
-      const storeProjects = [];
-      const selectedProjects = this.selectedProjects;
-      const projects = this.projects || [];
-      const projectsLength = projects.length;
-      storeRequest.projects = [];
-      if (selectedProjects && selectedProjects.length) {
-        for (let i = 0, len = selectedProjects.length; i < len; i++) {
-          const selected = selectedProjects[i];
-          if (!selected) {
-            continue;
-          }
-          const lowerSelected = selected.toLowerCase();
-          let hasProject = false;
-          for (let j = 0; j < projectsLength; j++) {
-            if (projects[j].name.toLowerCase() === lowerSelected) {
-              storeRequest.projects.push(projects[j]._id);
-              hasProject = true;
-              break;
-            }
-          }
-          if (!hasProject) {
-            storeProjects.push(selected);
-          }
-        }
-      }
+      const info = this._processSelectedProjectsInfo(this.selectedProjects);
+      storeRequest.projects = info.existing;
+
       const storeOptions = {
         isDrive: this.isDrive
       };
@@ -400,7 +263,7 @@ the License.
       }
       return {
         request: storeRequest,
-        projects: storeProjects.length ? storeProjects : undefined,
+        projects: info.add.length ? info.add : undefined,
         options: storeOptions
       };
     }

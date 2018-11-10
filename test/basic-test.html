@@ -70,27 +70,6 @@
             done();
           });
         });
-
-        test('Computes projects autocomplete array', function(done) {
-          const element = fixture('Basic');
-          element.addEventListener('iron-resize', function f() {
-            element.removeEventListener('iron-resize', f);
-            const result = element._computeAutocomplete(element.projects);
-            assert.lengthOf(result, 2);
-            done();
-          });
-        });
-
-        test('projects are sorted', function(done) {
-          const element = fixture('Basic');
-          element.addEventListener('iron-resize', function f() {
-            element.removeEventListener('iron-resize', f);
-            const result = element._computeAutocomplete(element.projects);
-            assert.equal(result[0], 'p2');
-            assert.equal(result[1], 'p1');
-            done();
-          });
-        });
       });
 
       suite('Validation', function() {
