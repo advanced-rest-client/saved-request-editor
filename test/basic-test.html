@@ -15,6 +15,12 @@
       </template>
     </test-fixture>
 
+    <test-fixture id="NoAutoProjects">
+      <template>
+        <saved-request-editor no-auto-projects></saved-request-editor>
+      </template>
+    </test-fixture>
+
     <test-fixture id="NewRequest">
       <template>
         <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test"}' name="test-name" description="test-description"></saved-request-editor>
@@ -60,13 +66,16 @@
       }
 
       suite('Basics', function() {
-        test('Queries for projects', function(done) {
-          const element = fixture('Basic');
-          element.addEventListener('project-model-query', (e) => {
-            assert.isTrue(e.cancelable);
-            done();
-          });
-        });
+        // test('Queries for projects', function(done) {
+        //   const element = fixture('Basic');
+        //   element.
+        //   element.addEventListener('project-model-query', (e) => {
+        //     assert.isTrue(e.cancelable);
+        //     e.preventDefault();
+        //     e.detail.result = Promise.resolve();
+        //     e.detail.result.then(() => done());
+        //   });
+        // });
 
         test('save request button is rendered', function(done) {
           const element = fixture('Basic');
@@ -109,6 +118,7 @@
         let element;
         setup((done) => {
           element = fixture('Basic');
+          // flush(() => done());
           element.addEventListener('iron-resize', function f() {
             element.removeEventListener('iron-resize', f);
             done();
@@ -426,8 +436,8 @@
 
       suite('_computeIsSaved()', () => {
         let element;
-        setup(() => {
-          element = fixture('Basic');
+        suiteSetup(() => {
+          element = fixture('NoAutoProjects');
         });
 
         test('Returns false when no argument', () => {
@@ -461,7 +471,7 @@
       suite('_cancel()', () => {
         let element;
         setup(() => {
-          element = fixture('Basic');
+          element = fixture('NoAutoProjects');
         });
 
         test('Dispatches "cancel-request-edit" event', () => {
