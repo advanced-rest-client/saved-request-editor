@@ -481,6 +481,24 @@
           assert.isTrue(spy.called);
         });
       });
+
+      suite('_toggleOptions()', () => {
+        let element;
+        setup(() => {
+          element = fixture('Basic');
+        });
+
+        test('Toggles additionalOptionsOpened true', () => {
+          element._toggleOptions();
+          assert.isTrue(element.additionalOptionsOpened);
+        });
+
+        test('Toggles additionalOptionsOpened false', () => {
+          element.additionalOptionsOpened = true;
+          element._toggleOptions();
+          assert.isFalse(element.additionalOptionsOpened);
+        });
+      });
     });
     </script>
   </body>
