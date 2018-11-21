@@ -1,6 +1,6 @@
 <!--
 @license
-Copyright 2016 The Advanced REST client authors <arc@mulesoft.com>
+Copyright 2018 The Advanced REST client authors <arc@mulesoft.com>
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of
 the License at
@@ -32,6 +32,10 @@ the License.
     :host {
       display: block;
       outline: none;
+      color: var(--saved-request-editor-color, inherit);
+      background-color: var(--saved-request-editor-background-color, inherit);
+      padding: var(--saved-request-editor-padding);
+      box-sizing: border-box;
       @apply --arc-font-body1;
       @apply --saved-request-editor;
     }
@@ -41,13 +45,24 @@ the License.
     }
 
     .additional-options {
-      color: rgba(0, 0, 0, 0.74);
+      color: var(--saved-request-editor-options-color, rgba(0, 0, 0, 0.74));
     }
 
     .caption {
       @apply --layout-horizontal;
       @apply --layout-center;
       cursor: pointer;
+    }
+
+    .caption-icon {
+      color: var(--saved-request-editor-caption-icon-color, rgba(0, 0, 0, 0.74));
+      transform: rotate(0deg);
+      transition: 0.31s transform ease-in-out;
+      @apply --saved-request-editor-caption-icon;
+    }
+
+    [data-caption-opened] .caption-icon {
+      transform: rotate(-180deg);
     }
 
     .options {
@@ -62,7 +77,8 @@ the License.
     }
 
     .actions paper-button {
-      color: var(--primary-color);
+      color: var(--saved-request-editor-action-button-color, var(--primary-color));
+      background-color: var(--saved-request-editor-action-button-background-color);
       padding-left: 12px;
       padding-right: 12px;
       @apply --saved-request-editor-action-buttons;
@@ -78,9 +94,9 @@ the License.
         <paper-textarea id="autogrow" label="Description (optional)" value="{{description}}" on-bind-value-changed="_autogrowCheckResize"></paper-textarea>
         <paper-chip-input label="Add to project" value="{{selectedProjects}}" source="[[_computeProjectsAutocomplete(projects)]]" chip-remove-icon="arc:close"></paper-chip-input>
         <section class="additional-options">
-          <div class="caption" on-click="_toggleOptions">
+          <div class="caption" on-click="_toggleOptions" data-caption-opened$="[[additionalOptionsOpened]]">
             Additional options
-            <paper-icon-button icon="arc:arrow-drop-down"></paper-icon-button>
+            <paper-icon-button icon="arc:arrow-drop-down" class="caption-icon"></paper-icon-button>
           </div>
           <iron-collapse opened="[[additionalOptionsOpened]]">
             <div class="options">
@@ -105,6 +121,21 @@ the License.
   /**
    * A dialog to edit request meta data.
    *
+   * It requires `<request-model>` and `<project-model>` to be in the DOM to
+   * handle data queries.
+   *
+   * ## Usage
+   *
+   * Assign `request` proeprty to a request obejct. The component decides
+   * what view to render (saved vs. not saved request).
+   *
+   * ```html
+   * <saved-request-editor request='{...}'></saved-request-editor>
+   * ```
+   *
+   * If the request has both `_id` and `_rev` proeprties (PouchDB properties)
+   * it renders "saved" view.
+   *
    * ### Styling
    *
    * `<saved-request-editor>` provides the following custom properties and mixins
@@ -113,6 +144,15 @@ the License.
    * Custom property | Description | Default
    * ----------------|-------------|----------
    * `--saved-request-editor` | Mixin applied to the element | `{}`
+   * `--saved-request-editor-color` | Color of the element | `inherit`
+   * `--saved-request-editor-background-color` | Background color of the element | `inherit`
+   * `--saved-request-editor-padding` | Padding of the element. | ``
+   * `--saved-request-editor-options-color` | Additional options section color | `rgba(0, 0, 0, 0.74)`
+   * `--saved-request-editor-caption-icon-color` | Color of the icon to toggle options | `rgba(0, 0, 0, 0.74)`
+   * `--saved-request-editor-caption-icon` | `Mixin applied to toggle options icon` | ``
+   * `--saved-request-editor-action-button-color` | Color of action button | `--primary-color`
+   * `--saved-request-editor-action-button-background-color` | Background color of action button | ``
+   * `--saved-request-editor-action-buttons` | Mixin applied to action buttons | ``
    *
    * @polymer
    * @customElement
@@ -123,7 +163,9 @@ the License.
   class SavedRequestEditor extends
     ArcComponents.ProjectsListConsumerMixin(
       Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)) {
-    static get is() {return 'saved-request-editor';}
+    static get is() {
+      return 'saved-request-editor';
+    }
     static get properties() {
       return {
         /**
