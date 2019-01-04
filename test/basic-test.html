@@ -1,336 +1,505 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
     <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
     <link rel="import" href="../saved-request-editor.html">
-    <link rel="import" href="../../arc-demo-helpers/data-generator.html">
   </head>
   <body>
-
-    <test-fixture id="basic">
+    <test-fixture id="Basic">
       <template>
         <saved-request-editor></saved-request-editor>
       </template>
     </test-fixture>
 
+    <test-fixture id="NoAutoProjects">
+      <template>
+        <saved-request-editor no-auto-projects></saved-request-editor>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="NewRequest">
+      <template>
+        <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test"}' name="test-name" description="test-description"></saved-request-editor>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="ExistingRequest">
+      <template>
+        <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test","_id":"test-id","_rev":"test-rev","type":"saved"}' name="test-name" description="test-description"></saved-request-editor>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="DriveSaved">
+      <template>
+        <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test","_id":"test-id","_rev":"test-rev","type":"saved","driveId":"testDriveId"}' name="test-name" description="test-description"></saved-request-editor>
+      </template>
+    </test-fixture>
+
     <script>
-    /* global fixture, assert, DataGenerator, MockInteractions, sinon, TestHelpers */
-
-    const TEST_NAME = 'test-name';
-    const TEST_DESCRIPTION = 'test-description';
-    const TEST_PROJECT_NAME = 'test-project';
-    var TEST_PROJECT_ID;
-    var requests;
-    var projects;
-
-    function getActionItem(element, action) {
-      var api = Polymer.dom(element.root);
-      return api.querySelector('[data-action="' + action + '"]');
-    }
-
-    function prepareEventData(element, result) {
-      element.addEventListener('save-request', function spy(e) {
-        element.removeEventListener('save-request', spy);
-        Object.keys(e.detail).forEach(name => {
-          result[name] = e.detail[name];
-        });
-      });
-      element.name = TEST_NAME;
-    }
-
-    suite('Saving new request', function() {
+    suite('saved-request-editor', function() {
+      function projectsRequestHandler(e) {
+        e.preventDefault();
+        e.detail.result = Promise.resolve([{
+          name: 'p1',
+          order: 2,
+          _id: 'id-1'
+        }, {
+          name: 'p2',
+          order: 1,
+          _id: 'id-2'
+        }]);
+      }
       suiteSetup(function() {
-        return DataGenerator.insertSavedIfNotExists()
-        .then(data => {
-          requests = data.requests;
-          projects = data.projects;
-          TEST_PROJECT_ID = projects[0]._id;
-        });
+        window.addEventListener('project-model-query', projectsRequestHandler);
       });
 
       suiteTeardown(function() {
-        return DataGenerator.destroySavedRequestData();
+        window.removeEventListener('project-model-query', projectsRequestHandler);
       });
 
-      var element;
-      setup(function(done) {
-        element = fixture('basic');
-        element.addEventListener('iron-resize', function resizeHandler() {
-          element.removeEventListener('iron-resize', resizeHandler);
-          done();
-        });
-      });
-
-      test('save request button is not hidden', function() {
-        var node = getActionItem(element, 'save-request');
-        assert.isFalse(node.hidden);
-      });
-
-      test('Do not fire save-request event when form not validating', function() {
-        var spy = sinon.spy();
-        element.addEventListener('save-request', spy);
-        var node = getActionItem(element, 'save-request');
-        MockInteractions.tap(node);
-        assert.isFalse(spy.called);
-      });
-
-      test('Fires save-request event when form is validating', function() {
-        var spy = sinon.spy();
-        element.name = TEST_NAME;
-        element.addEventListener('save-request', spy);
-        var node = getActionItem(element, 'save-request');
-        MockInteractions.tap(node);
-        assert.isTrue(spy.calledOnce);
-      });
-
-      function saveRequest() {
-        var node = getActionItem(element, 'save-request');
-        MockInteractions.tap(node);
+      function getActionItem(node, action) {
+        return node.shadowRoot.querySelector('[data-action="' + action + '"]');
       }
 
-      test('save-request event is cancelable', function(done) {
-        element.addEventListener('save-request', function spy(e) {
-          element.removeEventListener('save-request', spy);
-          assert.isTrue(e.cancelable);
-          done();
-        });
-        element.name = TEST_NAME;
-        saveRequest();
-      });
+      suite('Basics', function() {
+        // test('Queries for projects', function(done) {
+        //   const element = fixture('Basic');
+        //   element.
+        //   element.addEventListener('project-model-query', (e) => {
+        //     assert.isTrue(e.cancelable);
+        //     e.preventDefault();
+        //     e.detail.result = Promise.resolve();
+        //     e.detail.result.then(() => done());
+        //   });
+        // });
 
-      test('save-request event contains required data', function() {
-        var eventData = {};
-        prepareEventData(element, eventData);
-        element.description = TEST_DESCRIPTION;
-        saveRequest();
-        assert.equal(eventData.name, TEST_NAME);
-        assert.equal(eventData.description, TEST_DESCRIPTION);
-        assert.typeOf(eventData.override, 'boolean');
-        assert.typeOf(eventData.isDrive, 'boolean');
-        assert.typeOf(eventData.isProject, 'boolean');
-      });
-
-      test('Event data for no project and no drive are set', function() {
-        var eventData = {};
-        prepareEventData(element, eventData);
-        saveRequest();
-        assert.isFalse(eventData.override, 'override is false');
-        assert.isFalse(eventData.isDrive, 'isDrive is false');
-        assert.isFalse(eventData.isProject, 'isProject is false');
-      });
-
-      test('Event data for no project and for drive are set', function() {
-        var eventData = {};
-        prepareEventData(element, eventData);
-        element.isDrive = true;
-        saveRequest();
-        assert.isFalse(eventData.override, 'override is false');
-        assert.isTrue(eventData.isDrive, 'isDrive is true');
-        assert.isFalse(eventData.isProject, 'isProject is false');
-      });
-
-      test('Event data for existing project are set', function() {
-        var eventData = {};
-        prepareEventData(element, eventData);
-        element.projectId = TEST_PROJECT_ID;
-        assert.typeOf(element.projectName, 'string', 'Project name is computed');
-        assert.isFalse(element.projectIsNew, 'projectIsNew is computed');
-        saveRequest();
-        assert.isFalse(eventData.override, 'override is false');
-        assert.isFalse(eventData.isDrive, 'isDrive is false');
-        assert.isTrue(eventData.isProject, 'isProject is true');
-        assert.equal(eventData.projectId, TEST_PROJECT_ID, 'Project ID is set');
-        assert.isFalse(eventData.projectIsNew, 'projectIsNew is set');
-      });
-
-      test('Event data for new project are set', function() {
-        var eventData = {};
-        prepareEventData(element, eventData);
-        element.projectName = TEST_PROJECT_NAME;
-        assert.isUndefined(element.projectId, 'Project id is not computed');
-        assert.isTrue(element.projectIsNew, 'projectIsNew is computed');
-        saveRequest();
-        assert.isFalse(eventData.override, 'override is false');
-        assert.isFalse(eventData.isDrive, 'isDrive is false');
-        assert.isTrue(eventData.isProject, 'isProject is true');
-        assert.equal(eventData.projectName, TEST_PROJECT_NAME, 'Project name is set');
-        assert.isTrue(eventData.projectIsNew, 'projectIsNew is set');
-      });
-    });
-
-    suite('Saving existing request - basics', function() {
-      suiteSetup(function() {
-        return DataGenerator.insertSavedIfNotExists()
-        .then(data => {
-          requests = data.requests;
-          projects = data.projects;
-          TEST_PROJECT_ID = projects[0]._id;
+        test('save request button is rendered', function(done) {
+          const element = fixture('Basic');
+          flush(() => {
+            const node = getActionItem(element, 'save-request');
+            assert.ok(node);
+            done();
+          });
         });
       });
 
-      suiteTeardown(function() {
-        return DataGenerator.destroySavedRequestData();
-      });
+      suite('Validation', function() {
+        test('save-request event is not fired when invalid', function(done) {
+          const element = fixture('Basic');
+          flush(() => {
+            const spy = sinon.spy();
+            element.addEventListener('save-request', spy);
+            const node = getActionItem(element, 'save-request');
+            node.click();
+            assert.isFalse(spy.called);
+            done();
+          });
+        });
 
-      var element;
-      setup(function(done) {
-        element = fixture('basic');
-        element.addEventListener('iron-resize', function resizeHandler() {
-          element.removeEventListener('iron-resize', resizeHandler);
-          element.request = requests[0];
-          TestHelpers.forceXIfStamp(element);
-          done();
+        test('Fires save-request event when form is valid', function(done) {
+          const element = fixture('Basic');
+          flush(() => {
+            const spy = sinon.spy();
+            element.name = 'test';
+            element.addEventListener('save-request', spy);
+            const node = getActionItem(element, 'save-request');
+            node.click();
+            assert.isTrue(spy.calledOnce);
+            done();
+          });
         });
       });
 
-      test('isSaved property is computed', function() {
-        assert.isTrue(element.isSaved);
-      });
+      suite('Setting request data', function() {
+        let element;
+        setup((done) => {
+          element = fixture('Basic');
+          // flush(() => done());
+          element.addEventListener('iron-resize', function f() {
+            element.removeEventListener('iron-resize', f);
+            done();
+          });
+        });
 
-      test('save request button is hidden', function() {
-        var node = getActionItem(element, 'save-request');
-        assert.isTrue(node.hidden);
-      });
+        test('Sets name from request name', () => {
+          element.request = {
+            name: 'test'
+          };
+          assert.equal(element.name, 'test');
+        });
 
-      test('save as new button is rendered', function() {
-        var node = getActionItem(element, 'save-as-new');
-        assert.ok(node);
-      });
+        test('Sets description from request description', () => {
+          element.request = {
+            description: 'test'
+          };
+          assert.equal(element.description, 'test');
+        });
 
-      test('override button is rendered', function() {
-        var node = getActionItem(element, 'override');
-        assert.ok(node);
-      });
-    });
+        test('Sets isDrive when driveId is set on request', () => {
+          element.request = {
+            driveId: 'test'
+          };
+          assert.isTrue(element.isDrive);
+        });
 
-    suite('Saving existing request with project', function() {
-      suiteSetup(function() {
-        return DataGenerator.insertSavedIfNotExists()
-        .then(data => {
-          requests = data.requests;
-          projects = data.projects;
-          TEST_PROJECT_ID = projects[0]._id;
+        test('Does not set isDrive when request type is history', () => {
+          element.request = {
+            driveId: 'test',
+            type: 'history'
+          };
+          assert.isFalse(element.isDrive);
+        });
+
+        test('Does not set selectedProjects when no project info', () => {
+          element.request = {};
+          assert.isUndefined(element.selectedProjects);
+        });
+
+        test('Sets project id from legacyProject', () => {
+          element.request = {
+            legacyProject: 'unknown'
+          };
+          assert.equal(element.selectedProjects[0], 'unknown');
+        });
+
+        test('Sets project name from legacyProject', () => {
+          element.request = {
+            legacyProject: 'id-1'
+          };
+          assert.equal(element.selectedProjects[0], 'p1');
+        });
+
+        test('Sets project id from projects array', () => {
+          element.request = {
+            projects: ['unknown']
+          };
+          assert.equal(element.selectedProjects[0], 'unknown');
+        });
+
+        test('Sets project name from projects array', () => {
+          element.request = {
+            projects: ['id-1']
+          };
+          assert.equal(element.selectedProjects[0], 'p1');
+        });
+
+        test('isSaved is false when no rev', function() {
+          element.request = {};
+          assert.isFalse(element.isSaved);
+        });
+
+        test('isSaved is true when id', function() {
+          element.request = {
+            _rev: 'test'
+          };
+          assert.isTrue(element.isSaved);
+        });
+
+        test('isSaved is always false for history item', function() {
+          element.request = {
+            _rev: 'test',
+            type: 'history'
+          };
+          assert.isFalse(element.isSaved);
+        });
+
+        test('Renders override button for saved request', (done) => {
+          element.request = {
+            _rev: 'test'
+          };
+          flush(() => {
+            const node = getActionItem(element, 'override');
+            assert.ok(node);
+            done();
+          });
+        });
+
+        test('Renders save as new button for saved request', (done) => {
+          element.request = {
+            _rev: 'test'
+          };
+          flush(() => {
+            const node = getActionItem(element, 'save-as-new');
+            assert.ok(node);
+            done();
+          });
         });
       });
 
-      suiteTeardown(function() {
-        return DataGenerator.destroySavedRequestData();
-      });
+      suite('_computeEventDetail()', function() {
+        let element;
 
-      var element;
-      setup(function(done) {
-        element = fixture('basic');
-        element.addEventListener('iron-resize', function resizeHandler() {
-          element.removeEventListener('iron-resize', resizeHandler);
-          element.request = requests.find(item => item.legacyProject);
-          TestHelpers.forceXIfStamp(element);
-          done();
+        test('Contains request data', function(done) {
+          element = fixture('NewRequest');
+          flush(() => {
+            const result = element._computeEventDetail();
+            assert.deepEqual(result.request, {
+              method: 'GET',
+              url: 'https://domain.com',
+              headers: 'a-abc:test',
+              name: '',
+              projects: []
+            });
+            done();
+          });
+        });
+
+        test('Contains request name', function(done) {
+          element = fixture('NewRequest');
+          flush(() => {
+            element.name = 'test-name';
+            const result = element._computeEventDetail();
+            assert.deepEqual(result.request, {
+              method: 'GET',
+              url: 'https://domain.com',
+              headers: 'a-abc:test',
+              name: 'test-name',
+              projects: []
+            });
+            done();
+          });
+        });
+
+        test('Contains request description', function(done) {
+          element = fixture('NewRequest');
+          flush(() => {
+            element.description = 'test-desc';
+            const result = element._computeEventDetail();
+            assert.deepEqual(result.request, {
+              method: 'GET',
+              url: 'https://domain.com',
+              headers: 'a-abc:test',
+              name: '',
+              description: 'test-desc',
+              projects: []
+            });
+            done();
+          });
+        });
+
+        test('Adds existing projects', function(done) {
+          element = fixture('NewRequest');
+          element.addEventListener('iron-resize', function f() {
+            element.removeEventListener('iron-resize', f);
+            element.selectedProjects = ['p1'];
+            const result = element._computeEventDetail();
+            assert.deepEqual(result.request, {
+              method: 'GET',
+              url: 'https://domain.com',
+              headers: 'a-abc:test',
+              name: '',
+              projects: ['id-1']
+            });
+            done();
+          });
+        });
+
+        test('Adds not existing projects', function(done) {
+          element = fixture('NewRequest');
+          flush(() => {
+            element.selectedProjects = ['something'];
+            const result = element._computeEventDetail();
+            assert.deepEqual(result.projects, ['something']);
+            done();
+          });
+        });
+
+        test('Adds both existing and non-existing projects', function(done) {
+          element = fixture('NewRequest');
+
+          element.addEventListener('iron-resize', function f() {
+            element.removeEventListener('iron-resize', f);
+            element.selectedProjects = ['p1', 'something'];
+            const result = element._computeEventDetail();
+            assert.deepEqual(result.request.projects, ['id-1']);
+            assert.deepEqual(result.projects, ['something']);
+            done();
+          });
+        });
+
+        test('Keeps _id and _rev when updating request', function(done) {
+          element = fixture('ExistingRequest');
+          flush(() => {
+            element._setOverride(true);
+            const result = element._computeEventDetail();
+            assert.equal(result.request._id, 'test-id');
+            assert.equal(result.request._rev, 'test-rev');
+            done();
+          });
+        });
+
+        test('Removes _id and _rev when overriding request', function(done) {
+          element = fixture('ExistingRequest');
+          flush(() => {
+            element._setOverride(false);
+            const result = element._computeEventDetail();
+            assert.isUndefined(result.request._id);
+            assert.isUndefined(result.request._rev);
+            done();
+          });
+        });
+
+        test('Sets isDrive on options', function(done) {
+          element = fixture('ExistingRequest');
+          flush(() => {
+            element._setOverride(false);
+            element.isDrive = true;
+            const result = element._computeEventDetail();
+            assert.isTrue(result.options.isDrive);
+            done();
+          });
+        });
+
+        test('Removes driveId from the request', function(done) {
+          element = fixture('DriveSaved');
+          flush(() => {
+            element._setOverride(false);
+            element.isDrive = false;
+            const result = element._computeEventDetail();
+            assert.isUndefined(result.request.driveId);
+            done();
+          });
         });
       });
 
-      function saveRequest() {
-        var node = getActionItem(element, 'save-as-new');
-        MockInteractions.tap(node);
-      }
+      suite('save-request event dispatch', function() {
+        let element;
+        setup((done) => {
+          element = fixture('ExistingRequest');
+          element.addEventListener('iron-resize', function f() {
+            element.removeEventListener('iron-resize', f);
+            element.name = 'test-name';
+            element.selectedProjects = ['p1', 'something'];
+            done();
+          });
+        });
 
-      function overrideRequest() {
-        var node = getActionItem(element, 'override');
-        MockInteractions.tap(node);
-      }
+        test('Save request event is cancelable', (done) => {
+          element.addEventListener('save-request', function(e) {
+            assert.isTrue(e.cancelable);
+            done();
+          });
+          const node = getActionItem(element, 'override');
+          node.click();
+        });
 
-      test('projectName property is computed', function() {
-        assert.typeOf(element.projectName, 'string');
+        test('Dispatches update type event', (done) => {
+          element.addEventListener('save-request', function(e) {
+            const data = e.detail;
+            assert.equal(data.request._id, 'test-id');
+            assert.equal(data.request._rev, 'test-rev');
+            done();
+          });
+          const node = getActionItem(element, 'override');
+          node.click();
+        });
+
+        test('Update type event has all detail properties', (done) => {
+          element.addEventListener('save-request', function(e) {
+            const data = e.detail;
+            assert.ok(data.request);
+            assert.ok(data.projects);
+            assert.ok(data.projects);
+            done();
+          });
+          const node = getActionItem(element, 'override');
+          node.click();
+        });
+
+        test('Dispatches save as new type event', (done) => {
+          element.addEventListener('save-request', function(e) {
+            const data = e.detail;
+            assert.isUndefined(data.request._id);
+            assert.isUndefined(data.request._rev);
+            done();
+          });
+          const node = getActionItem(element, 'save-as-new');
+          node.click();
+        });
+
+        test('Save as new type event has all detail properties', (done) => {
+          element.addEventListener('save-request', function(e) {
+            const data = e.detail;
+            assert.ok(data.request);
+            assert.ok(data.projects);
+            assert.ok(data.projects);
+            done();
+          });
+          const node = getActionItem(element, 'save-as-new');
+          node.click();
+        });
       });
 
-      test('projectId property is computed', function() {
-        assert.typeOf(element.projectId, 'string');
+      suite('_computeIsSaved()', () => {
+        let element;
+        suiteSetup(() => {
+          element = fixture('NoAutoProjects');
+        });
+
+        test('Returns false when no argument', () => {
+          const result = element._computeIsSaved();
+          assert.isFalse(result);
+        });
+
+        test('Returns false when type is history', () => {
+          const result = element._computeIsSaved({
+            type: 'history'
+          });
+          assert.isFalse(result);
+        });
+
+        test('Returns false when _rev is not set', () => {
+          const result = element._computeIsSaved({
+            type: 'saved'
+          });
+          assert.isFalse(result);
+        });
+
+        test('Returns true when _rev is set', () => {
+          const result = element._computeIsSaved({
+            type: 'saved',
+            _rev: 'test'
+          });
+          assert.isTrue(result);
+        });
       });
 
-      test('projectIsNew property is computed', function() {
-        assert.isFalse(element.projectIsNew);
+      suite('_cancel()', () => {
+        let element;
+        setup(() => {
+          element = fixture('NoAutoProjects');
+        });
+
+        test('Dispatches "cancel-request-edit" event', () => {
+          const spy = sinon.spy();
+          element.addEventListener('cancel-request-edit', spy);
+          element._cancel();
+          assert.isTrue(spy.called);
+        });
       });
 
-      test('Clears project data when request change', function() {
-        var requestCopy = Object.assign({}, element.request);
-        delete requestCopy.legacyProject;
-        element.request = requestCopy;
-        assert.isUndefined(element.projectId, 'projectId is cleared');
-        assert.equal(element.projectName, '', 'projectName is cleared');
-      });
+      suite('_toggleOptions()', () => {
+        let element;
+        setup(() => {
+          element = fixture('Basic');
+        });
 
-      test('Event data for override are set', function() {
-        var eventData = {};
-        prepareEventData(element, eventData);
-        overrideRequest();
-        assert.isTrue(eventData.override, 'override is true');
-        assert.typeOf(eventData.isDrive, 'boolean', 'isDrive is set');
-        assert.isTrue(eventData.isProject, 'isProject is true');
-        assert.equal(eventData.projectId, element.request.legacyProject, 'ProjectId is set');
-        assert.isFalse(eventData.projectIsNew, 'projectIsNew is set');
-        assert.deepEqual(eventData.request, element.request, 'Request object is set');
-      });
+        test('Toggles additionalOptionsOpened true', () => {
+          element._toggleOptions();
+          assert.isTrue(element.additionalOptionsOpened);
+        });
 
-      test('Event data for save as new are set', function() {
-        var eventData = {};
-        prepareEventData(element, eventData);
-        saveRequest();
-        assert.isFalse(eventData.override, 'override is false');
-        assert.typeOf(eventData.isDrive, 'boolean', 'isDrive is set');
-        assert.isTrue(eventData.isProject, 'isProject is true');
-        assert.equal(eventData.projectId, element.request.legacyProject, 'ProjectId is set');
-        assert.isFalse(eventData.projectIsNew, 'projectIsNew is set');
-        assert.deepEqual(eventData.request, element.request, 'Request object is set');
-      });
-
-      test('Change project name of the request to other existing', function() {
-        var eventData = {};
-        prepareEventData(element, eventData);
-
-        var currentProjectId = element.request.legacyProject;
-        var newProject = projects.find(item => item._id !== currentProjectId);
-        element.projectName = newProject.name;
-        TestHelpers.forceXIfStamp(element);
-
-        saveRequest();
-        assert.isFalse(eventData.override, 'override is false');
-        assert.typeOf(eventData.isDrive, 'boolean', 'isDrive is set');
-        assert.isTrue(eventData.isProject, 'isProject is true');
-        assert.equal(eventData.projectId, newProject._id, 'ProjectId is set');
-        assert.isFalse(eventData.projectIsNew, 'projectIsNew is set');
-        assert.deepEqual(eventData.request, element.request, 'Request object is set');
-      });
-
-      test('Change project name of the request to not existing', function() {
-        var eventData = {};
-        prepareEventData(element, eventData);
-        element.projectName = TEST_PROJECT_NAME;
-        TestHelpers.forceXIfStamp(element);
-
-        saveRequest();
-        assert.isFalse(eventData.override, 'override is false');
-        assert.typeOf(eventData.isDrive, 'boolean', 'isDrive is set');
-        assert.isTrue(eventData.isProject, 'isProject is true');
-        assert.equal(eventData.projectName, TEST_PROJECT_NAME, 'Project name is set');
-        assert.isTrue(eventData.projectIsNew, 'projectIsNew is set');
-        assert.deepEqual(eventData.request, element.request, 'Request object is set');
+        test('Toggles additionalOptionsOpened false', () => {
+          element.additionalOptionsOpened = true;
+          element._toggleOptions();
+          assert.isFalse(element.additionalOptionsOpened);
+        });
       });
     });
     </script>
-
   </body>
 </html>
