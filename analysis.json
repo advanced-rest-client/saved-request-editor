@@ -2,10 +2,82 @@
   "schema_version": "1.0.0",
   "elements": [
     {
-      "description": "A dialog to edit request meta data.\n\n### Styling\n\n`<saved-request-editor>` provides the following custom properties and mixins\nfor styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--saved-request-editor` | Mixin applied to the element | `{}`",
+      "description": "A dialog to edit request meta data.\n\nIt requires `<request-model>` and `<project-model>` to be in the DOM to\nhandle data queries.\n\n## Usage\n\nAssign `request` proeprty to a request obejct. The component decides\nwhat view to render (saved vs. not saved request).\n\n```html\n<saved-request-editor request='{...}'></saved-request-editor>\n```\n\nIf the request has both `_id` and `_rev` proeprties (PouchDB properties)\nit renders \"saved\" view.\n\n### Styling\n\n`<saved-request-editor>` provides the following custom properties and mixins\nfor styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--saved-request-editor` | Mixin applied to the element | `{}`\n`--saved-request-editor-color` | Color of the element | `inherit`\n`--saved-request-editor-background-color` | Background color of the element | `inherit`\n`--saved-request-editor-padding` | Padding of the element. | ``\n`--saved-request-editor-options-color` | Additional options section color | `rgba(0, 0, 0, 0.74)`\n`--saved-request-editor-caption-icon-color` | Color of the icon to toggle options | `rgba(0, 0, 0, 0.74)`\n`--saved-request-editor-caption-icon` | `Mixin applied to toggle options icon` | ``\n`--saved-request-editor-action-button-color` | Color of action button | `--primary-color`\n`--saved-request-editor-action-button-background-color` | Background color of action button | ``\n`--saved-request-editor-action-buttons` | Mixin applied to action buttons | ``",
       "summary": "",
       "path": "saved-request-editor.html",
       "properties": [
+        {
+          "name": "projects",
+          "type": "Array | null | undefined",
+          "description": "List of available projects.",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 44,
+              "column": 8
+            },
+            "end": {
+              "line": 44,
+              "column": 23
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "hasProjects",
+          "type": "boolean | null | undefined",
+          "description": "Computed value, true if any project is on the list.",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 48,
+              "column": 8
+            },
+            "end": {
+              "line": 53,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "notify": true,
+              "readOnly": true,
+              "attributeType": "Boolean"
+            }
+          },
+          "defaultValue": "false",
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "noAutoProjects",
+          "type": "boolean | null | undefined",
+          "description": "When set the element won't request projects list when attached to the dom.\nWhen set `refreshProjects()` has to be called manually.",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 58,
+              "column": 8
+            },
+            "end": {
+              "line": 58,
+              "column": 31
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Boolean"
+            }
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
         {
           "name": "request",
           "type": "Object | null | undefined",
@@ -13,11 +85,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 134,
+              "line": 177,
               "column": 8
             },
             "end": {
-              "line": 134,
+              "line": 177,
               "column": 23
             }
           },
@@ -34,11 +106,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 138,
+              "line": 181,
               "column": 8
             },
             "end": {
-              "line": 138,
+              "line": 181,
               "column": 20
             }
           },
@@ -55,11 +127,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 142,
+              "line": 185,
               "column": 8
             },
             "end": {
-              "line": 142,
+              "line": 185,
               "column": 27
             }
           },
@@ -76,11 +148,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 147,
+              "line": 190,
               "column": 8
             },
             "end": {
-              "line": 151,
+              "line": 194,
               "column": 9
             }
           },
@@ -99,11 +171,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 155,
+              "line": 198,
               "column": 8
             },
             "end": {
-              "line": 155,
+              "line": 198,
               "column": 24
             }
           },
@@ -114,38 +186,17 @@
           }
         },
         {
-          "name": "projects",
-          "type": "Array | null | undefined",
-          "description": "List of available projects.",
-          "privacy": "public",
-          "sourceRange": {
-            "start": {
-              "line": 159,
-              "column": 8
-            },
-            "end": {
-              "line": 159,
-              "column": 23
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "attributeType": "Array"
-            }
-          }
-        },
-        {
           "name": "override",
           "type": "boolean | null | undefined",
           "description": "Set if the user chooses to override current request.",
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 163,
+              "line": 202,
               "column": 8
             },
             "end": {
-              "line": 166,
+              "line": 205,
               "column": 9
             }
           },
@@ -163,11 +214,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 168,
+              "line": 207,
               "column": 8
             },
             "end": {
-              "line": 168,
+              "line": 207,
               "column": 40
             }
           },
@@ -184,11 +235,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 173,
+              "line": 212,
               "column": 8
             },
             "end": {
-              "line": 173,
+              "line": 212,
               "column": 31
             }
           },
@@ -206,11 +257,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 189,
+              "line": 222,
               "column": 4
             },
             "end": {
-              "line": 198,
+              "line": 226,
               "column": 5
             }
           },
@@ -225,12 +276,13 @@
           "description": "",
           "privacy": "public",
           "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
             "start": {
-              "line": 200,
+              "line": 81,
               "column": 4
             },
             "end": {
-              "line": 206,
+              "line": 87,
               "column": 5
             }
           },
@@ -238,19 +290,49 @@
           "params": [],
           "return": {
             "type": "void"
-          }
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
         },
         {
-          "name": "_projectDataChanged",
-          "description": "Updates the list of projects when project object changed.",
+          "name": "_computeHasProjects",
+          "description": "Computes value for `hasProjects` property",
           "privacy": "protected",
           "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
             "start": {
-              "line": 213,
+              "line": 93,
               "column": 4
             },
             "end": {
-              "line": 218,
+              "line": 95,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "record",
+              "type": "Object",
+              "description": "Polymer change record"
+            }
+          ],
+          "return": {
+            "type": "Boolean"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_projectDataImportHandler",
+          "description": "Refreshes projects list when ARC data were imported.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 100,
+              "column": 4
+            },
+            "end": {
+              "line": 105,
               "column": 5
             }
           },
@@ -263,19 +345,21 @@
           ],
           "return": {
             "type": "void"
-          }
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
         },
         {
-          "name": "_datastoreDestroyed",
-          "description": "Updates the list of projects when project datastore has been destroyed.",
+          "name": "_projectDatabaseDestroyedHandler",
+          "description": "Handler for `datastore-destroyed` custom event.\nRefreshes list of projects afyter clearing the data.",
           "privacy": "protected",
           "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
             "start": {
-              "line": 223,
+              "line": 111,
               "column": 4
             },
             "end": {
-              "line": 236,
+              "line": 125,
               "column": 5
             }
           },
@@ -288,19 +372,21 @@
           ],
           "return": {
             "type": "void"
-          }
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
         },
         {
-          "name": "_refreshProjectsList",
+          "name": "refreshProjects",
           "description": "Refreshes the list of projects after next render frame.",
-          "privacy": "protected",
+          "privacy": "public",
           "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
             "start": {
-              "line": 240,
+              "line": 129,
               "column": 4
             },
             "end": {
-              "line": 242,
+              "line": 138,
               "column": 5
             }
           },
@@ -308,7 +394,221 @@
           "params": [],
           "return": {
             "type": "void"
-          }
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_projectChangedHandler",
+          "description": "Handler for non-cancelable `project-object-changed` event.\nUpdates the project on projects list or adds it if it's new project.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 144,
+              "column": 4
+            },
+            "end": {
+              "line": 165,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ],
+          "return": {
+            "type": "void"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_projectDeletedHandler",
+          "description": "Handler for `project-object-deleted` custom event.\nRemoves a project from the list if applicable.\nThis will not handle cancelable events.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 172,
+              "column": 4
+            },
+            "end": {
+              "line": 187,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ],
+          "return": {
+            "type": "void"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_dispatchProjectQueryEvent",
+          "description": "Dispatches `project-model-query` custom event and returns it.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 192,
+              "column": 4
+            },
+            "end": {
+              "line": 201,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "CustomEvent"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_updateProjectsList",
+          "description": "Updates list of available projects after the overlay is opened.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 206,
+              "column": 4
+            },
+            "end": {
+              "line": 223,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "Promise"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_projectsSortFn",
+          "description": "Sort function used to sort projects in order.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 230,
+              "column": 4
+            },
+            "end": {
+              "line": 240,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "a",
+              "type": "Object"
+            },
+            {
+              "name": "b",
+              "type": "Object"
+            }
+          ],
+          "return": {
+            "type": "Number"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_computeProjectsAutocomplete",
+          "description": "Computes a list of suggestion for autocomplete element.\nFrom the list of `projects` it takes names for each project and returns\nnew list for suggestions.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 248,
+              "column": 4
+            },
+            "end": {
+              "line": 263,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "projects",
+              "type": "Array.<Object>"
+            }
+          ],
+          "return": {
+            "type": "Array.<String>"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_handleProjectsError",
+          "description": "Handles errors.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 269,
+              "column": 4
+            },
+            "end": {
+              "line": 281,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "cause",
+              "type": "Error",
+              "description": "Error object"
+            }
+          ],
+          "return": {
+            "type": "void"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_processSelectedProjectsInfo",
+          "description": "Processes projects name list and returns object with\n`add` property as a list of project names that do not yet exists and\n`existing` property with a list of IDs of existing projects.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 292,
+              "column": 4
+            },
+            "end": {
+              "line": 321,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selectedProjects",
+              "type": "Array.<String>",
+              "description": "List of selected projects to process."
+            }
+          ],
+          "return": {
+            "type": "Object",
+            "desc": "`add` {Array<String>} List of names of a projects to create\n- `existing` {Array<String>} List of IDs of existing projects"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
         },
         {
           "name": "reset",
@@ -316,11 +616,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 247,
+              "line": 230,
               "column": 4
             },
             "end": {
-              "line": 252,
+              "line": 235,
               "column": 5
             }
           },
@@ -336,11 +636,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 256,
+              "line": 239,
               "column": 4
             },
             "end": {
-              "line": 261,
+              "line": 243,
               "column": 5
             }
           },
@@ -356,11 +656,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 265,
+              "line": 247,
               "column": 4
             },
             "end": {
-              "line": 268,
+              "line": 250,
               "column": 5
             }
           },
@@ -376,11 +676,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 272,
+              "line": 254,
               "column": 4
             },
             "end": {
-              "line": 275,
+              "line": 257,
               "column": 5
             }
           },
@@ -396,11 +696,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 277,
+              "line": 259,
               "column": 4
             },
             "end": {
-              "line": 282,
+              "line": 264,
               "column": 5
             }
           },
@@ -411,82 +711,16 @@
           }
         },
         {
-          "name": "_updateProjectsList",
-          "description": "Updates list of available projects after the overlay is opened.",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 284,
-              "column": 4
-            },
-            "end": {
-              "line": 314,
-              "column": 5
-            }
-          },
-          "metadata": {},
-          "params": []
-        },
-        {
-          "name": "_projectsSortFn",
-          "description": "Sort function used to sort projects in order.",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 316,
-              "column": 4
-            },
-            "end": {
-              "line": 326,
-              "column": 5
-            }
-          },
-          "metadata": {},
-          "params": [
-            {
-              "name": "a"
-            },
-            {
-              "name": "b"
-            }
-          ]
-        },
-        {
-          "name": "_computeAutocomplete",
-          "description": "Computes a list of suggestion for autocomplete element.\nFrom the list of `projects` it takes names for each project and returns\nnew list for suggestions.",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 334,
-              "column": 4
-            },
-            "end": {
-              "line": 339,
-              "column": 5
-            }
-          },
-          "metadata": {},
-          "params": [
-            {
-              "name": "projects",
-              "type": "Array.<Object>"
-            }
-          ],
-          "return": {
-            "type": "Array.<String>"
-          }
-        },
-        {
           "name": "_formSubmit",
           "description": "Sends the `save-request` custom event with computed detail object.",
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 345,
+              "line": 270,
               "column": 4
             },
             "end": {
-              "line": 355,
+              "line": 280,
               "column": 5
             }
           },
@@ -507,11 +741,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 360,
+              "line": 285,
               "column": 4
             },
             "end": {
-              "line": 406,
+              "line": 309,
               "column": 5
             }
           },
@@ -528,11 +762,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 408,
+              "line": 311,
               "column": 4
             },
             "end": {
-              "line": 410,
+              "line": 313,
               "column": 5
             }
           },
@@ -544,24 +778,29 @@
         },
         {
           "name": "_computeIsSaved",
-          "description": "",
+          "description": "Computes value for `isSaved` property.",
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 412,
+              "line": 319,
               "column": 4
             },
             "end": {
-              "line": 418,
+              "line": 325,
               "column": 5
             }
           },
           "metadata": {},
           "params": [
             {
-              "name": "request"
+              "name": "request",
+              "type": "?Object",
+              "description": "Request object assigned to the `request`"
             }
-          ]
+          ],
+          "return": {
+            "type": "Boolean"
+          }
         },
         {
           "name": "_requestChanged",
@@ -569,11 +808,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 420,
+              "line": 327,
               "column": 4
             },
             "end": {
-              "line": 454,
+              "line": 361,
               "column": 5
             }
           },
@@ -596,11 +835,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 458,
+              "line": 365,
               "column": 4
             },
             "end": {
-              "line": 467,
+              "line": 374,
               "column": 5
             }
           },
@@ -616,11 +855,11 @@
       "metadata": {},
       "sourceRange": {
         "start": {
-          "line": 122,
+          "line": 162,
           "column": 2
         },
         "end": {
-          "line": 488,
+          "line": 395,
           "column": 3
         }
       },
@@ -629,15 +868,69 @@
       "name": "UiElements.SavedRequestEditor",
       "attributes": [
         {
+          "name": "projects",
+          "description": "List of available projects.",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 44,
+              "column": 8
+            },
+            "end": {
+              "line": 44,
+              "column": 23
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined",
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "has-projects",
+          "description": "Computed value, true if any project is on the list.",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 48,
+              "column": 8
+            },
+            "end": {
+              "line": 53,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined",
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "no-auto-projects",
+          "description": "When set the element won't request projects list when attached to the dom.\nWhen set `refreshProjects()` has to be called manually.",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 58,
+              "column": 8
+            },
+            "end": {
+              "line": 58,
+              "column": 31
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined",
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
           "name": "request",
           "description": "The request object to be saved / updated in the datastore.\nIt's not required for the editor to work.\nThis object will be attached to `save-request` object as a reference.\nWhen this object change it computes values for `name`, `isSaved`,\n`isDrive`, `projectName` and `projectId` properties.",
           "sourceRange": {
             "start": {
-              "line": 134,
+              "line": 177,
               "column": 8
             },
             "end": {
-              "line": 134,
+              "line": 177,
               "column": 23
             }
           },
@@ -649,11 +942,11 @@
           "description": "Name of the request.",
           "sourceRange": {
             "start": {
-              "line": 138,
+              "line": 181,
               "column": 8
             },
             "end": {
-              "line": 138,
+              "line": 181,
               "column": 20
             }
           },
@@ -665,11 +958,11 @@
           "description": "Request description.",
           "sourceRange": {
             "start": {
-              "line": 142,
+              "line": 185,
               "column": 8
             },
             "end": {
-              "line": 142,
+              "line": 185,
               "column": 27
             }
           },
@@ -681,11 +974,11 @@
           "description": "Should be set if the request has been already saved in the datastore.\nAdds UI controls to override or save as new.",
           "sourceRange": {
             "start": {
-              "line": 147,
+              "line": 190,
               "column": 8
             },
             "end": {
-              "line": 151,
+              "line": 194,
               "column": 9
             }
           },
@@ -697,11 +990,11 @@
           "description": "True when saving request to Google Drive.",
           "sourceRange": {
             "start": {
-              "line": 155,
+              "line": 198,
               "column": 8
             },
             "end": {
-              "line": 155,
+              "line": 198,
               "column": 24
             }
           },
@@ -709,31 +1002,15 @@
           "type": "boolean | null | undefined"
         },
         {
-          "name": "projects",
-          "description": "List of available projects.",
-          "sourceRange": {
-            "start": {
-              "line": 159,
-              "column": 8
-            },
-            "end": {
-              "line": 159,
-              "column": 23
-            }
-          },
-          "metadata": {},
-          "type": "Array | null | undefined"
-        },
-        {
           "name": "override",
           "description": "Set if the user chooses to override current request.",
           "sourceRange": {
             "start": {
-              "line": 163,
+              "line": 202,
               "column": 8
             },
             "end": {
-              "line": 166,
+              "line": 205,
               "column": 9
             }
           },
@@ -745,11 +1022,11 @@
           "description": "True when additional options are opened.",
           "sourceRange": {
             "start": {
-              "line": 168,
+              "line": 207,
               "column": 8
             },
             "end": {
-              "line": 168,
+              "line": 207,
               "column": 40
             }
           },
@@ -761,11 +1038,11 @@
           "description": "List of selected in the dialog project names.",
           "sourceRange": {
             "start": {
-              "line": 173,
+              "line": 212,
               "column": 8
             },
             "end": {
-              "line": 173,
+              "line": 212,
               "column": 31
             }
           },
@@ -794,7 +1071,8 @@
       "slots": [],
       "tagname": "saved-request-editor",
       "mixins": [
-        "Polymer.IronResizableBehavior"
+        "Polymer.IronResizableBehavior",
+        "ArcComponents.ProjectsListConsumerMixin"
       ]
     }
   ]
