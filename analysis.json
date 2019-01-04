@@ -1,0 +1,1079 @@
+{
+  "schema_version": "1.0.0",
+  "elements": [
+    {
+      "description": "A dialog to edit request meta data.\n\nIt requires `<request-model>` and `<project-model>` to be in the DOM to\nhandle data queries.\n\n## Usage\n\nAssign `request` proeprty to a request obejct. The component decides\nwhat view to render (saved vs. not saved request).\n\n```html\n<saved-request-editor request='{...}'></saved-request-editor>\n```\n\nIf the request has both `_id` and `_rev` proeprties (PouchDB properties)\nit renders \"saved\" view.\n\n### Styling\n\n`<saved-request-editor>` provides the following custom properties and mixins\nfor styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--saved-request-editor` | Mixin applied to the element | `{}`\n`--saved-request-editor-color` | Color of the element | `inherit`\n`--saved-request-editor-background-color` | Background color of the element | `inherit`\n`--saved-request-editor-padding` | Padding of the element. | ``\n`--saved-request-editor-options-color` | Additional options section color | `rgba(0, 0, 0, 0.74)`\n`--saved-request-editor-caption-icon-color` | Color of the icon to toggle options | `rgba(0, 0, 0, 0.74)`\n`--saved-request-editor-caption-icon` | `Mixin applied to toggle options icon` | ``\n`--saved-request-editor-action-button-color` | Color of action button | `--primary-color`\n`--saved-request-editor-action-button-background-color` | Background color of action button | ``\n`--saved-request-editor-action-buttons` | Mixin applied to action buttons | ``",
+      "summary": "",
+      "path": "saved-request-editor.html",
+      "properties": [
+        {
+          "name": "projects",
+          "type": "Array | null | undefined",
+          "description": "List of available projects.",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 44,
+              "column": 8
+            },
+            "end": {
+              "line": 44,
+              "column": 23
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "hasProjects",
+          "type": "boolean | null | undefined",
+          "description": "Computed value, true if any project is on the list.",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 48,
+              "column": 8
+            },
+            "end": {
+              "line": 53,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "notify": true,
+              "readOnly": true,
+              "attributeType": "Boolean"
+            }
+          },
+          "defaultValue": "false",
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "noAutoProjects",
+          "type": "boolean | null | undefined",
+          "description": "When set the element won't request projects list when attached to the dom.\nWhen set `refreshProjects()` has to be called manually.",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 58,
+              "column": 8
+            },
+            "end": {
+              "line": 58,
+              "column": 31
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Boolean"
+            }
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "request",
+          "type": "Object | null | undefined",
+          "description": "The request object to be saved / updated in the datastore.\nIt's not required for the editor to work.\nThis object will be attached to `save-request` object as a reference.\nWhen this object change it computes values for `name`, `isSaved`,\n`isDrive`, `projectName` and `projectId` properties.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 177,
+              "column": 8
+            },
+            "end": {
+              "line": 177,
+              "column": 23
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Object"
+            }
+          }
+        },
+        {
+          "name": "name",
+          "type": "string | null | undefined",
+          "description": "Name of the request.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 181,
+              "column": 8
+            },
+            "end": {
+              "line": 181,
+              "column": 20
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          }
+        },
+        {
+          "name": "description",
+          "type": "string | null | undefined",
+          "description": "Request description.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 185,
+              "column": 8
+            },
+            "end": {
+              "line": 185,
+              "column": 27
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "String"
+            }
+          }
+        },
+        {
+          "name": "isSaved",
+          "type": "boolean | null | undefined",
+          "description": "Should be set if the request has been already saved in the datastore.\nAdds UI controls to override or save as new.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 190,
+              "column": 8
+            },
+            "end": {
+              "line": 194,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "readOnly": true,
+              "attributeType": "Boolean"
+            }
+          },
+          "defaultValue": "false"
+        },
+        {
+          "name": "isDrive",
+          "type": "boolean | null | undefined",
+          "description": "True when saving request to Google Drive.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 198,
+              "column": 8
+            },
+            "end": {
+              "line": 198,
+              "column": 24
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Boolean"
+            }
+          }
+        },
+        {
+          "name": "override",
+          "type": "boolean | null | undefined",
+          "description": "Set if the user chooses to override current request.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 202,
+              "column": 8
+            },
+            "end": {
+              "line": 205,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "readOnly": true,
+              "attributeType": "Boolean"
+            }
+          }
+        },
+        {
+          "name": "additionalOptionsOpened",
+          "type": "boolean | null | undefined",
+          "description": "True when additional options are opened.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 207,
+              "column": 8
+            },
+            "end": {
+              "line": 207,
+              "column": 40
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Boolean"
+            }
+          }
+        },
+        {
+          "name": "selectedProjects",
+          "type": "Array.<String>",
+          "description": "List of selected in the dialog project names.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 212,
+              "column": 8
+            },
+            "end": {
+              "line": 212,
+              "column": 31
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Array"
+            }
+          }
+        }
+      ],
+      "methods": [
+        {
+          "name": "connectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 222,
+              "column": 4
+            },
+            "end": {
+              "line": 226,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "disconnectedCallback",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 81,
+              "column": 4
+            },
+            "end": {
+              "line": 87,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_computeHasProjects",
+          "description": "Computes value for `hasProjects` property",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 93,
+              "column": 4
+            },
+            "end": {
+              "line": 95,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "record",
+              "type": "Object",
+              "description": "Polymer change record"
+            }
+          ],
+          "return": {
+            "type": "Boolean"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_projectDataImportHandler",
+          "description": "Refreshes projects list when ARC data were imported.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 100,
+              "column": 4
+            },
+            "end": {
+              "line": 105,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ],
+          "return": {
+            "type": "void"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_projectDatabaseDestroyedHandler",
+          "description": "Handler for `datastore-destroyed` custom event.\nRefreshes list of projects afyter clearing the data.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 111,
+              "column": 4
+            },
+            "end": {
+              "line": 125,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ],
+          "return": {
+            "type": "void"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "refreshProjects",
+          "description": "Refreshes the list of projects after next render frame.",
+          "privacy": "public",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 129,
+              "column": 4
+            },
+            "end": {
+              "line": 138,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_projectChangedHandler",
+          "description": "Handler for non-cancelable `project-object-changed` event.\nUpdates the project on projects list or adds it if it's new project.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 144,
+              "column": 4
+            },
+            "end": {
+              "line": 165,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ],
+          "return": {
+            "type": "void"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_projectDeletedHandler",
+          "description": "Handler for `project-object-deleted` custom event.\nRemoves a project from the list if applicable.\nThis will not handle cancelable events.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 172,
+              "column": 4
+            },
+            "end": {
+              "line": 187,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ],
+          "return": {
+            "type": "void"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_dispatchProjectQueryEvent",
+          "description": "Dispatches `project-model-query` custom event and returns it.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 192,
+              "column": 4
+            },
+            "end": {
+              "line": 201,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "CustomEvent"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_updateProjectsList",
+          "description": "Updates list of available projects after the overlay is opened.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 206,
+              "column": 4
+            },
+            "end": {
+              "line": 223,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "Promise"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_projectsSortFn",
+          "description": "Sort function used to sort projects in order.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 230,
+              "column": 4
+            },
+            "end": {
+              "line": 240,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "a",
+              "type": "Object"
+            },
+            {
+              "name": "b",
+              "type": "Object"
+            }
+          ],
+          "return": {
+            "type": "Number"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_computeProjectsAutocomplete",
+          "description": "Computes a list of suggestion for autocomplete element.\nFrom the list of `projects` it takes names for each project and returns\nnew list for suggestions.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 248,
+              "column": 4
+            },
+            "end": {
+              "line": 263,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "projects",
+              "type": "Array.<Object>"
+            }
+          ],
+          "return": {
+            "type": "Array.<String>"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_handleProjectsError",
+          "description": "Handles errors.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 269,
+              "column": 4
+            },
+            "end": {
+              "line": 281,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "cause",
+              "type": "Error",
+              "description": "Error object"
+            }
+          ],
+          "return": {
+            "type": "void"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "_processSelectedProjectsInfo",
+          "description": "Processes projects name list and returns object with\n`add` property as a list of project names that do not yet exists and\n`existing` property with a list of IDs of existing projects.",
+          "privacy": "protected",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 292,
+              "column": 4
+            },
+            "end": {
+              "line": 321,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "selectedProjects",
+              "type": "Array.<String>",
+              "description": "List of selected projects to process."
+            }
+          ],
+          "return": {
+            "type": "Object",
+            "desc": "`add` {Array<String>} List of names of a projects to create\n- `existing` {Array<String>} List of IDs of existing projects"
+          },
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "reset",
+          "description": "Resets the state of the UI",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 230,
+              "column": 4
+            },
+            "end": {
+              "line": 235,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_cancel",
+          "description": "Sends the `cancel-request-edit` custom event to cancel the edit.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 239,
+              "column": 4
+            },
+            "end": {
+              "line": 243,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_save",
+          "description": "Sets `override` to `false` and sends the form.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 247,
+              "column": 4
+            },
+            "end": {
+              "line": 250,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_override",
+          "description": "Sets `override` to `true` and sends the form.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 254,
+              "column": 4
+            },
+            "end": {
+              "line": 257,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_sendForm",
+          "description": "Validates and submits the form.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 259,
+              "column": 4
+            },
+            "end": {
+              "line": 264,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_formSubmit",
+          "description": "Sends the `save-request` custom event with computed detail object.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 270,
+              "column": 4
+            },
+            "end": {
+              "line": 280,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e",
+              "type": "CustomEvent"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_computeEventDetail",
+          "description": "Computes `save-request` custom event's `detail` object",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 285,
+              "column": 4
+            },
+            "end": {
+              "line": 309,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "Object",
+            "desc": "A detail property of the event."
+          }
+        },
+        {
+          "name": "_toggleOptions",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 311,
+              "column": 4
+            },
+            "end": {
+              "line": 313,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_computeIsSaved",
+          "description": "Computes value for `isSaved` property.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 319,
+              "column": 4
+            },
+            "end": {
+              "line": 325,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "request",
+              "type": "?Object",
+              "description": "Request object assigned to the `request`"
+            }
+          ],
+          "return": {
+            "type": "Boolean"
+          }
+        },
+        {
+          "name": "_requestChanged",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 327,
+              "column": 4
+            },
+            "end": {
+              "line": 361,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "request"
+            },
+            {
+              "name": "projects"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_autogrowCheckResize",
+          "description": "Notifies resize when the height of autogrow textarea changes.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 365,
+              "column": 4
+            },
+            "end": {
+              "line": 374,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [],
+          "return": {
+            "type": "void"
+          }
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 162,
+          "column": 2
+        },
+        "end": {
+          "line": 395,
+          "column": 3
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "UiElements.SavedRequestEditor",
+      "attributes": [
+        {
+          "name": "projects",
+          "description": "List of available projects.",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 44,
+              "column": 8
+            },
+            "end": {
+              "line": 44,
+              "column": 23
+            }
+          },
+          "metadata": {},
+          "type": "Array | null | undefined",
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "has-projects",
+          "description": "Computed value, true if any project is on the list.",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 48,
+              "column": 8
+            },
+            "end": {
+              "line": 53,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined",
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "no-auto-projects",
+          "description": "When set the element won't request projects list when attached to the dom.\nWhen set `refreshProjects()` has to be called manually.",
+          "sourceRange": {
+            "file": "../projects-list-consumer-mixin/projects-list-consumer-mixin.html",
+            "start": {
+              "line": 58,
+              "column": 8
+            },
+            "end": {
+              "line": 58,
+              "column": 31
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined",
+          "inheritedFrom": "ArcComponents.ProjectsListConsumerMixin"
+        },
+        {
+          "name": "request",
+          "description": "The request object to be saved / updated in the datastore.\nIt's not required for the editor to work.\nThis object will be attached to `save-request` object as a reference.\nWhen this object change it computes values for `name`, `isSaved`,\n`isDrive`, `projectName` and `projectId` properties.",
+          "sourceRange": {
+            "start": {
+              "line": 177,
+              "column": 8
+            },
+            "end": {
+              "line": 177,
+              "column": 23
+            }
+          },
+          "metadata": {},
+          "type": "Object | null | undefined"
+        },
+        {
+          "name": "name",
+          "description": "Name of the request.",
+          "sourceRange": {
+            "start": {
+              "line": 181,
+              "column": 8
+            },
+            "end": {
+              "line": 181,
+              "column": 20
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "description",
+          "description": "Request description.",
+          "sourceRange": {
+            "start": {
+              "line": 185,
+              "column": 8
+            },
+            "end": {
+              "line": 185,
+              "column": 27
+            }
+          },
+          "metadata": {},
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "is-saved",
+          "description": "Should be set if the request has been already saved in the datastore.\nAdds UI controls to override or save as new.",
+          "sourceRange": {
+            "start": {
+              "line": 190,
+              "column": 8
+            },
+            "end": {
+              "line": 194,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "is-drive",
+          "description": "True when saving request to Google Drive.",
+          "sourceRange": {
+            "start": {
+              "line": 198,
+              "column": 8
+            },
+            "end": {
+              "line": 198,
+              "column": 24
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "override",
+          "description": "Set if the user chooses to override current request.",
+          "sourceRange": {
+            "start": {
+              "line": 202,
+              "column": 8
+            },
+            "end": {
+              "line": 205,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "additional-options-opened",
+          "description": "True when additional options are opened.",
+          "sourceRange": {
+            "start": {
+              "line": 207,
+              "column": 8
+            },
+            "end": {
+              "line": 207,
+              "column": 40
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "selected-projects",
+          "description": "List of selected in the dialog project names.",
+          "sourceRange": {
+            "start": {
+              "line": 212,
+              "column": 8
+            },
+            "end": {
+              "line": 212,
+              "column": 31
+            }
+          },
+          "metadata": {},
+          "type": "Array.<String>"
+        }
+      ],
+      "events": [
+        {
+          "type": "CustomEvent",
+          "name": "cancel-request-edit",
+          "description": "Fired when the user cancels the editor.",
+          "metadata": {}
+        },
+        {
+          "type": "CustomEvent",
+          "name": "save-request",
+          "description": "Fire when the user saves the request.",
+          "metadata": {}
+        }
+      ],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "saved-request-editor",
+      "mixins": [
+        "Polymer.IronResizableBehavior",
+        "ArcComponents.ProjectsListConsumerMixin"
+      ]
+    }
+  ]
+}
