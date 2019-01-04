@@ -25,6 +25,33 @@
 
 
 
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/advanced-rest-client/saved-request-editor/compare/0.1.8...2.0.0) (2019-01-04)
+
+
+### Breaking
+
+* Updated component to new datastore structure ([afc79f39646c10dcf15287d004dcca2a866a926f](https://github.com/advanced-rest-client/saved-request-editor/commit/afc79f39646c10dcf15287d004dcca2a866a926f))
+
+### Docs
+
+* Adding documentation ([ab491c4ae996b63e861c2c05bc6c29bc387b55c8](https://github.com/advanced-rest-client/saved-request-editor/commit/ab491c4ae996b63e861c2c05bc6c29bc387b55c8))
+* Updating docs. ([51756b576b0ee44ca84d612f0323259ae1aa0976](https://github.com/advanced-rest-client/saved-request-editor/commit/51756b576b0ee44ca84d612f0323259ae1aa0976))
+
+### Updat
+
+* Removing driveId if the request is no longer connected to the drive object ([e25fe45bca1b78ec1e9c6cee598ae1ee08dadcde](https://github.com/advanced-rest-client/saved-request-editor/commit/e25fe45bca1b78ec1e9c6cee598ae1ee08dadcde))
+
+### Update
+
+* Adding `projects-list-consumer-mixin` ([e718a8192082ae13dec6667e86602a317fe1243c](https://github.com/advanced-rest-client/saved-request-editor/commit/e718a8192082ae13dec6667e86602a317fe1243c))
+* Empty request will now clear the UI ([898c8ee914abb35b053f89ac78cfbc19bdb0c66d](https://github.com/advanced-rest-client/saved-request-editor/commit/898c8ee914abb35b053f89ac78cfbc19bdb0c66d))
+* The element tests for `_rev` to determine if request is saved ([634be1504a0fd1178fe8796f69000409240379a1](https://github.com/advanced-rest-client/saved-request-editor/commit/634be1504a0fd1178fe8796f69000409240379a1))
+* Updating demo page. ([bf371c8dabcfa64a671dd85d54d3ad852a48e769](https://github.com/advanced-rest-client/saved-request-editor/commit/bf371c8dabcfa64a671dd85d54d3ad852a48e769))
+* Updating styling options to support theming ([1f4b8f83a8b7c55fb8a4a1861d2c3c922f39b9f0](https://github.com/advanced-rest-client/saved-request-editor/commit/1f4b8f83a8b7c55fb8a4a1861d2c3c922f39b9f0))
+
+
+
 <a name="0.1.9"></a>
 ## [0.1.9](https://github.com/advanced-rest-client/saved-request-editor/compare/0.1.8...0.1.9) (2017-10-13)
 
