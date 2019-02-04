@@ -92,7 +92,7 @@ the License.
       <form method="post">
         <paper-input label="Request name (required)" required auto-validate error-message="Name is required" value="{{name}}"></paper-input>
         <paper-textarea id="autogrow" label="Description (optional)" value="{{description}}" on-bind-value-changed="_autogrowCheckResize"></paper-textarea>
-        <paper-chip-input label="Add to project" value="{{selectedProjects}}" source="[[_computeProjectsAutocomplete(projects)]]" chip-remove-icon="arc:close"></paper-chip-input>
+        <paper-chip-input label="Add to project" value="{{selectedProjects}}" source="[[_computeProjectsAutocomplete(projects)]]" chip-remove-icon="arc:close" on-iron-overlay-opened="_stopEvent" on-iron-overlay-closed="_stopEvent"></paper-chip-input>
         <section class="additional-options">
           <div class="caption" on-click="_toggleOptions" data-caption-opened$="[[additionalOptionsOpened]]">
             Additional options
@@ -372,6 +372,10 @@ the License.
         this._lastAutogrowHeight = this.$.autogrow.offsetHeight;
         this.notifyResize();
       }
+    }
+
+    _stopEvent(e) {
+      e.stopPropagation();
     }
 
     /**
