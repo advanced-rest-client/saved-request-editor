@@ -23,11 +23,23 @@
 
     <test-fixture id="NewRequest">
       <template>
+        <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test"}' name="test-name" description="test-description" no-auto-projects></saved-request-editor>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="NewRequestProjects">
+      <template>
         <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test"}' name="test-name" description="test-description"></saved-request-editor>
       </template>
     </test-fixture>
 
     <test-fixture id="ExistingRequest">
+      <template>
+        <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test","_id":"test-id","_rev":"test-rev","type":"saved"}' name="test-name" description="test-description" no-auto-projects></saved-request-editor>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="ExistingRequestProject">
       <template>
         <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test","_id":"test-id","_rev":"test-rev","type":"saved"}' name="test-name" description="test-description"></saved-request-editor>
       </template>
@@ -35,7 +47,7 @@
 
     <test-fixture id="DriveSaved">
       <template>
-        <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test","_id":"test-id","_rev":"test-rev","type":"saved","driveId":"testDriveId"}' name="test-name" description="test-description"></saved-request-editor>
+        <saved-request-editor request='{"method":"GET","url":"https://domain.com","headers":"a-abc:test","_id":"test-id","_rev":"test-rev","type":"saved","driveId":"testDriveId"}' name="test-name" description="test-description" no-auto-projects></saved-request-editor>
       </template>
     </test-fixture>
 
@@ -282,7 +294,7 @@
         });
 
         test('Adds existing projects', function(done) {
-          element = fixture('NewRequest');
+          element = fixture('NewRequestProjects');
           element.addEventListener('iron-resize', function f() {
             element.removeEventListener('iron-resize', f);
             element.selectedProjects = ['p1'];
@@ -309,7 +321,7 @@
         });
 
         test('Adds both existing and non-existing projects', function(done) {
-          element = fixture('NewRequest');
+          element = fixture('NewRequestProjects');
 
           element.addEventListener('iron-resize', function f() {
             element.removeEventListener('iron-resize', f);
@@ -369,7 +381,7 @@
       suite('save-request event dispatch', function() {
         let element;
         setup((done) => {
-          element = fixture('ExistingRequest');
+          element = fixture('ExistingRequestProject');
           element.addEventListener('iron-resize', function f() {
             element.removeEventListener('iron-resize', f);
             element.name = 'test-name';
