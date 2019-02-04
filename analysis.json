@@ -848,6 +848,30 @@
           "return": {
             "type": "void"
           }
+        },
+        {
+          "name": "_stopEvent",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 376,
+              "column": 4
+            },
+            "end": {
+              "line": 378,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "e"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
         }
       ],
       "staticMethods": [],
@@ -859,7 +883,7 @@
           "column": 2
         },
         "end": {
-          "line": 395,
+          "line": 399,
           "column": 3
         }
       },

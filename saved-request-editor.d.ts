@@ -167,6 +167,7 @@ declare namespace UiElements {
      * Notifies resize when the height of autogrow textarea changes.
      */
     _autogrowCheckResize(): void;
+    _stopEvent(e: any): void;
   }
 }
 
