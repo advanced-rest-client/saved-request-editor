@@ -5,28 +5,12 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   saved-request-editor.html
+ *   saved-request-editor.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
-
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../polymer/types/lib/elements/dom-if.d.ts" />
-/// <reference path="../polymer/types/lib/legacy/class.d.ts" />
-/// <reference path="../iron-resizable-behavior/iron-resizable-behavior.d.ts" />
-/// <reference path="../iron-flex-layout/iron-flex-layout.d.ts" />
-/// <reference path="../paper-checkbox/paper-checkbox.d.ts" />
-/// <reference path="../paper-input/paper-input.d.ts" />
-/// <reference path="../paper-input/paper-textarea.d.ts" />
-/// <reference path="../paper-button/paper-button.d.ts" />
-/// <reference path="../paper-chip-input/paper-chip-input.d.ts" />
-/// <reference path="../iron-form/iron-form.d.ts" />
-/// <reference path="../iron-collapse/iron-collapse.d.ts" />
-/// <reference path="../paper-icon-button/paper-icon-button.d.ts" />
-/// <reference path="../arc-icons/arc-icons.d.ts" />
-/// <reference path="../projects-list-consumer-mixin/projects-list-consumer-mixin.d.ts" />
 
 declare namespace UiElements {
 
@@ -68,7 +52,7 @@ declare namespace UiElements {
    */
   class SavedRequestEditor extends
     Polymer.IronResizableBehavior(
-    ArcComponents.ProjectsListConsumerMixin(
+    ProjectsListConsumerMixin(
     Object)) {
 
     /**
@@ -171,6 +155,11 @@ declare namespace UiElements {
   }
 }
 
-interface HTMLElementTagNameMap {
-  "saved-request-editor": UiElements.SavedRequestEditor;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "saved-request-editor": UiElements.SavedRequestEditor;
+  }
 }
+
+export {};

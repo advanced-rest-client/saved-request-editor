@@ -1,22 +1,20 @@
-<!doctype html>
-<html>
-<head>
+<!DOCTYPE html><html><head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
   <title>saved-request-editor demo</title>
-  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
-  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-  <link rel="import" href="../../app-pouchdb/pouchdb.html">
-  <link rel="import" href="../../arc-models/project-model.html">
-  <link rel="import" href="../../arc-models/request-model.html">
-  <link rel="import" href="../../paper-toast/paper-toast.html">
-  <link rel="import" href="../../paper-button/paper-button.html">
-  <link rel="import" href="../../arc-data-generator/arc-data-generator.html">
-  <link rel="import" href="../../saved-menu/saved-menu.html">
-  <link rel="import" href="../saved-request-editor.html">
-  <link rel="import" href="../../arc-electron-default-theme/arc-electron-default-theme.html">
+  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+  <script type="module" src="../../../@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
+  <script type="module" src="../../../@polymer/iron-demo-helpers/demo-snippet.js"></script>
+  <script type="module" src="../../../@advanced-rest-client/arc-models/project-model.js"></script>
+  <script type="module" src="../../../@advanced-rest-client/arc-models/request-model.js"></script>
+  <script type="module" src="../../../@polymer/paper-toast/paper-toast.js"></script>
+  <script type="module" src="../../../@polymer/paper-button/paper-button.js"></script>
+  <script type="module" src="../../../@advanced-rest-client/saved-menu/saved-menu.js"></script>
+  <script type="module" src="../../../@advanced-rest-client/arc-electron-default-theme/arc-electron-default-theme.js"></script>
+  <script type="module" src="../saved-request-editor.js"></script>
+
   <custom-style>
     <style include="demo-pages-shared-styles">
     body,
@@ -71,7 +69,7 @@
     </style>
   </custom-style>
 </head>
-<body unresolved>
+<body unresolved="">
   <dom-bind id="app">
     <template>
       <project-model></project-model>
@@ -88,12 +86,12 @@
 
           <div class="centered card">
             <h3>Data options</h3>
-            <paper-button raised on-click="generateData">Generate random data</paper-button>
-            <paper-button raised on-click="clearStore">Clear data stores</paper-button>
-            <paper-button raised on-click="assignEmptyRequest">Assign random not saved request</paper-button>
-            <paper-button raised on-click="stylePanel">Apply theme</paper-button>
+            <paper-button raised="" on-click="generateData">Generate random data</paper-button>
+            <paper-button raised="" on-click="clearStore">Clear data stores</paper-button>
+            <paper-button raised="" on-click="assignEmptyRequest">Assign random not saved request</paper-button>
+            <paper-button raised="" on-click="stylePanel">Apply theme</paper-button>
             <template is="dom-if" if="[[styled]]">
-              <paper-button raised on-click="unstylePanel">Remove theme</paper-button>
+              <paper-button raised="" on-click="unstylePanel">Remove theme</paper-button>
             </template>
           </div>
 
@@ -105,18 +103,22 @@
             <p>URL: [[request.url]]</p>
             <p>Projects list: [[request.projects]]</p>
             <p>Google Drive ID: [[request.driveId]]</p>
-          </section>
+          </div>
         </section>
       </div>
     </template>
   </dom-bind>
+
   <paper-toast id="savedToast" text="The request has been saved"></paper-toast>
   <paper-toast id="cancelToast" text="Cancel action detected"></paper-toast>
   <paper-toast id="genDataToast" text="The request data has been generated"></paper-toast>
   <paper-toast id="delDataToast" text="The request data has been destroyed"></paper-toast>
   <paper-toast id="emptySetToast" text="Generate some data first"></paper-toast>
-  <script>
-  /* global DataGenerator, chance */
+
+  <script type="module">
+  import {DataGenerator} from '../../../@advanced-rest-client/arc-data-generator/arc-data-generator.js';
+  import '../../../chance/dist/chance.min.js';
+  /* global chance */
   (function(app) {
     app.styled = false;
 
