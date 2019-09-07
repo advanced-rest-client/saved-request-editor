@@ -11,22 +11,21 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
-import '../../@polymer/polymer/lib/elements/dom-if.js';
-import {mixinBehaviors} from '../../@polymer/polymer/lib/legacy/class.js';
-import {IronResizableBehavior} from '../../@polymer/iron-resizable-behavior/iron-resizable-behavior.js';
-import '../../@polymer/paper-checkbox/paper-checkbox.js';
-import '../../@polymer/paper-input/paper-input.js';
-import '../../@polymer/paper-input/paper-textarea.js';
-import '../../@polymer/paper-button/paper-button.js';
-import '../../@advanced-rest-client/paper-chip-input/paper-chip-input.js';
-import '../../@polymer/iron-form/iron-form.js';
-import '../../@polymer/iron-collapse/iron-collapse.js';
-import '../../@polymer/paper-icon-button/paper-icon-button.js';
-import '../../@advanced-rest-client/arc-icons/arc-icons.js';
-import {ProjectsListConsumerMixin} from
-  '../../@advanced-rest-client/projects-list-consumer-mixin/projects-list-consumer-mixin.js';
-import {html} from '../../@polymer/polymer/lib/utils/html-tag.js';
+import { SavedRequestDetail } from '@advanced-rest-client/saved-request-detail';
+import { html, css } from 'lit-element';
+import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
+import '@anypoint-web-components/anypoint-input/anypoint-input.js';
+import '@anypoint-web-components/anypoint-input/anypoint-textarea.js';
+import '@anypoint-web-components/anypoint-button/anypoint-button.js';
+import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
+import '@anypoint-web-components/anypoint-chip-input/anypoint-chip-input.js';
+import '@polymer/iron-form/iron-form.js';
+import '@polymer/iron-collapse/iron-collapse.js';
+import '@advanced-rest-client/arc-icons/arc-icons.js';
+import '@polymer/iron-icon/iron-icon.js';
+import '@advanced-rest-client/code-mirror/code-mirror.js';
+import { ProjectsListConsumerMixin } from
+  '@advanced-rest-client/projects-list-consumer-mixin/projects-list-consumer-mixin.js';
 /**
  * A dialog to edit request meta data.
  *
@@ -63,189 +62,260 @@ import {html} from '../../@polymer/polymer/lib/utils/html-tag.js';
  * `--saved-request-editor-action-button-background-color` | Background color of action button | ``
  * `--saved-request-editor-action-buttons` | Mixin applied to action buttons | ``
  *
- * @polymer
  * @customElement
  * @memberof UiElements
  * @appliesMixin Polymer.IronResizableBehavior
  * @appliesMixin ProjectsListConsumerMixin
  */
-class SavedRequestEditor extends ProjectsListConsumerMixin(
-    mixinBehaviors([IronResizableBehavior], PolymerElement)) {
-  static get template() {
-    return html`<style>
-    :host {
-      display: block;
-      outline: none;
-      color: var(--saved-request-editor-color, inherit);
-      background-color: var(--saved-request-editor-background-color, inherit);
-      padding: var(--saved-request-editor-padding);
-      box-sizing: border-box;
-      @apply --arc-font-body1;
-    }
+class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDetail) {
+  static get styles() {
+    return [
+      SavedRequestDetail.styles,
+      css`
+      :host {
+        --code-mirror-height: var(--saved-request-editor-cm-height, 200px);
+      }
 
-    form {
-      outline: none;
-    }
+      form {
+        outline: none;
+      }
 
-    .additional-options {
-      color: var(--saved-request-editor-options-color, rgba(0, 0, 0, 0.74));
-    }
+      .additional-options {
+        color: var(--saved-request-editor-options-color, rgba(0, 0, 0, 0.74));
+      }
 
-    .caption {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      cursor: pointer;
-    }
+      .caption {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        cursor: pointer;
+      }
 
-    .caption-icon {
-      color: var(--saved-request-editor-caption-icon-color, rgba(0, 0, 0, 0.74));
-      transform: rotate(0deg);
-      transition: 0.31s transform ease-in-out;
-    }
+      .caption-icon {
+        color: var(--saved-request-editor-caption-icon-color, rgba(0, 0, 0, 0.74));
+        transform: rotate(0deg);
+        transition: 0.31s transform ease-in-out;
+      }
 
-    [data-caption-opened] .caption-icon {
-      transform: rotate(-180deg);
-    }
+      [data-caption-opened] .caption-icon {
+        transform: rotate(-180deg);
+      }
 
-    .options {
-      margin-top: 16px;
-    }
+      .options {
+        margin-top: 16px;
+      }
 
-    .actions {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-      margin-top: 20px;
-    }
+      anypoint-input,
+      anypoint-chip-input {
+        width: calc(100% - 16px);
+      }
 
-    .actions paper-button {
-      color: var(--saved-request-editor-action-button-color, var(--primary-color));
-      background-color: var(--saved-request-editor-action-button-background-color);
-      padding-left: 12px;
-      padding-right: 12px;
-    }
+      .cm-wrap {
+        margin: 16px 8px;
+      }
+      `
+    ];
+  }
 
-    .actions paper-button.action-button {
-      background-color: var(--action-button-background-color, var(--primary-color));
-      color: var(--action-button-color, white);
-    }
-    </style>
-    <iron-form id="form" on-iron-form-presubmit="_formSubmit">
+  _titleTemplate() {
+    const { name, compatibility } = this;
+    return html`
+    <anypoint-input
+      required
+      autovalidate
+      invalidmessage="Name is required"
+      .value="${name}"
+      name="name"
+      @input="${this._inputChanged}"
+      ?compatibility="${compatibility}">
+      <label slot="label">Request name (required)</label>
+    </anypoint-input>
+    `;
+  }
+
+  _descriptionTemplate() {
+    const { description } = this;
+    return html`
+    <div class="cm-wrap">
+      <label for="cm">Description (markdown)</label>
+      <code-mirror
+        id="cm"
+        mode="markdown"
+        .value="${description}"
+        @value-changed="${this._editorValueChanged}"
+        gutters='["CodeMirror-lint-markers"]'
+        lineNumbers></code-mirror>
+    </div>`;
+    // return html`<anypoint-textarea
+    //   .value="${description}"
+    //   name="description"
+    //   @input="${this._inputChanged}"
+    //   ?compatibility="${compatibility}">
+    //   <label slot="label">Description (optional)</label>
+    // </anypoint-textarea>`;
+  }
+
+  _projectsTemplate() {
+    const { compatibility, selectedProjects, projects } = this;
+    const source = this._computeProjectsAutocomplete(projects);
+    return html`<anypoint-chip-input
+      .chipsValue="${selectedProjects}"
+      .source="${source}"
+      chipremoveicon="arc:close"
+      @overlay-opened="${this._stopEvent}"
+      @overlay-closed="${this._stopEvent}"
+      @chips-changed="${this._projectsHandler}"
+      ?compatibility="${compatibility}">
+      <label slot="label">Add to project</label>
+    </anypoint-chip-input>`;
+  }
+
+  _additionalActionsTemplate() {
+    const { additionalOptionsOpened, compatibility, isDrive } = this;
+    return html`<section class="additional-options">
+      <div class="caption"
+        @click="${this._toggleOptions}"
+        ?data-caption-opened="${additionalOptionsOpened}">
+        Additional options
+        <anypoint-icon-button
+          ?compatibility="${compatibility}"
+          class="caption-icon"
+          aria-label="Activate to toggle additional options">
+          <iron-icon icon="arc:arrow-drop-down"></iron-icon>
+        </anypoint-icon-button>
+      </div>
+      <iron-collapse .opened="${additionalOptionsOpened}">
+        <div class="options">
+          <anypoint-checkbox
+            .checked="${isDrive}"
+            @checked-changed="${this._isDriveHandler}">Save to Google Drive</anypoint-checkbox>
+        </div>
+      </iron-collapse>
+    </section>`;
+  }
+
+  _actionsTemplate() {
+    const isSaved = this._computeIsSaved(this.request);
+    const { _saving } = this;
+    return html`
+    <anypoint-button
+      @click="${this._cancel}"
+      data-action="cancel-edit"
+      title="Cancels any changes"
+      aria-label="Activate to cancel editor"
+      ?compatibility="${this.compatibility}">
+      Cancel
+    </anypoint-button>
+    ${isSaved ? html`<anypoint-button
+      @click="${this._save}"
+      data-action="save-as-new"
+      title="Saves request as new object"
+      aria-label="Activate to save request as new object"
+      ?compatibility="${this.compatibility}"
+      ?disabled="${_saving}">
+      Save as new
+    </anypoint-button>
+    <anypoint-button
+      @click="${this._overrideHandler}"
+      data-action="override"
+      title="Replaces request data"
+      aria-label="Activate to update the request"
+      ?compatibility="${this.compatibility}"
+      ?disabled="${_saving}">
+      Update
+    </anypoint-button>` : html`<anypoint-button
+      class="action-button"
+      @click="${this._save}"
+      data-action="save-request"
+      title="Commits changes and stores request in data store"
+      aria-label="Activate to save the request"
+      ?compatibility="${this.compatibility}"
+      ?disabled="${_saving}">Save</anypoint-button>`}
+    `;
+  }
+
+  render() {
+    return html`
+    <iron-form id="form" @iron-form-presubmit="${this._formSubmit}">
       <form method="post">
-        <paper-input
-          label="Request name (required)"
-          required=""
-          auto-validate=""
-          error-message="Name is required"
-          value="{{name}}"></paper-input>
-        <paper-textarea
-          id="autogrow"
-          label="Description (optional)"
-          value="{{description}}"
-          on-bind-value-changed="_autogrowCheckResize"></paper-textarea>
-        <paper-chip-input
-          label="Add to project"
-          value="{{selectedProjects}}"
-          source="[[_computeProjectsAutocomplete(projects)]]"
-          chip-remove-icon="arc:close"
-          on-iron-overlay-opened="_stopEvent"
-          on-iron-overlay-closed="_stopEvent"></paper-chip-input>
-        <section class="additional-options">
-          <div class="caption" on-click="_toggleOptions" data-caption-opened\$="[[additionalOptionsOpened]]">
-            Additional options
-            <paper-icon-button icon="arc:arrow-drop-down" class="caption-icon"></paper-icon-button>
-          </div>
-          <iron-collapse opened="[[additionalOptionsOpened]]">
-            <div class="options">
-              <paper-checkbox checked="{{isDrive}}">Save to Google Drive</paper-checkbox>
-            </div>
-          </iron-collapse>
-        </section>
+        ${this._modelTemplate()}
+        ${this._titleTemplate()}
+        ${this._projectsTemplate()}
+        ${this._descriptionTemplate()}
+        ${this._additionalActionsTemplate()}
       </form>
     </iron-form>
     <div class="actions">
-      <paper-button on-click="_cancel" data-action="cancel-edit" title="Cancels any changes">cancel</paper-button>
-      <template is="dom-if" if="[[isSaved]]">
-        <paper-button
-          on-click="_save"
-          data-action="save-as-new"
-          title="Saves request as new object">Save as new</paper-button>
-        <paper-button
-          class="action-button"
-          on-click="_override"
-          data-action="override"
-          title="Replaces request data">Update</paper-button>
-      </template>
-      <template is="dom-if" if="[[!isSaved]]">
-        <paper-button
-          class="action-button"
-          on-click="_save"
-          data-action="save-request"
-          title="Commits changes and stores request in data store">Save</paper-button>
-      </template>
+      ${this._actionsTemplate()}
     </div>`;
   }
 
   static get properties() {
     return {
       /**
-       * The request object to be saved / updated in the datastore.
-       * It's not required for the editor to work.
-       * This object will be attached to `save-request` object as a reference.
-       * When this object change it computes values for `name`, `isSaved`,
-       * `isDrive`, `projectName` and `projectId` properties.
-       */
-      request: Object,
-      /**
        * Name of the request.
        */
-      name: String,
+      name: { type: String },
       /**
        * Request description.
        */
-      description: String,
-      /**
-       * Should be set if the request has been already saved in the datastore.
-       * Adds UI controls to override or save as new.
-       */
-      isSaved: {
-        type: Boolean,
-        value: false,
-        computed: '_computeIsSaved(request)'
-      },
+      description: { type: String },
       /**
        * True when saving request to Google Drive.
        */
-      isDrive: Boolean,
+      isDrive: { type: Boolean },
       /**
        * Set if the user chooses to override current request.
        */
-      override: {
-        type: Boolean,
-        readOnly: true
-      },
+     _override: { type: Boolean },
       // True when additional options are opened.
-      additionalOptionsOpened: Boolean,
+      additionalOptionsOpened: { type: Boolean },
       /**
        * List of selected in the dialog project names.
        * @type {Array<String>}
        */
-      selectedProjects: Array
+      selectedProjects: { type: Array },
+
+      _saving: { type: Boolean }
     };
   }
 
-  static get observers() {
-    return [
-      '_requestChanged(request, projects)'
-    ];
+  constructor() {
+    super();
+    this._projectsChanged = this._projectsChanged.bind(this);
+    this._requestChangedHandler = this._requestChangedHandler.bind(this);
   }
 
   connectedCallback() {
-    super.connectedCallback();
-    this._ensureAttribute('tabindex', -1);
-    this._ensureAttribute('role', 'dialog');
+    if (super.connectedCallback) {
+      super.connectedCallback();
+    }
+    this.addEventListener('projects-changed', this._projectsChanged);
+    window.addEventListener('request-object-changed', this._requestChangedHandler);
   }
+
+  disconnectedCallback() {
+    if (super.disconnectedCallback) {
+      super.disconnectedCallback();
+    }
+    this.removeEventListener('projects-changed', this._projectsChanged);
+    window.removeEventListener('request-object-changed', this._requestChangedHandler);
+  }
+
+  _projectsChanged() {
+    this._requestChanged(this.request);
+  }
+
+  _requestChangedHandler(e) {
+    const { request } = this;
+    if (e.cancelable || !request) {
+      return;
+    }
+    if (e.detail.request._id === request._id) {
+      this.request = e.detail.request;
+    }
+  }
+
   /**
    * Resets the state of the UI
    */
@@ -253,52 +323,54 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(
     this.isDrive = false;
     this.name = '';
     this.description = '';
-    this.set('selectedProjects', []);
+    this.selectedProjects = [];
   }
   /**
-   * Sends the `cancel-request-edit` custom event to cancel the edit.
+   * Sends the `cancel` custom event to cancel the edit.
    */
   _cancel() {
-    this.dispatchEvent(new CustomEvent('cancel-request-edit', {
-      composed: true
-    }));
+    this.dispatchEvent(new CustomEvent('cancel'));
   }
   /**
    * Sets `override` to `false` and sends the form.
    */
   _save() {
-    this._setOverride(false);
+    this._override = false;
     this._sendForm();
   }
   /**
    * Sets `override` to `true` and sends the form.
    */
-  _override() {
-    this._setOverride(true);
+  _overrideHandler() {
+    this._override = true;
     this._sendForm();
   }
   // Validates and submits the form.
   _sendForm() {
-    if (!this.$.form.validate()) {
+    const form = this.shadowRoot.querySelector('iron-form');
+    if (!form.validate()) {
       return;
     }
-    this.$.form.submit();
+    form.submit();
   }
   /**
    * Sends the `save-request` custom event with computed detail object.
    *
    * @param {CustomEvent} e
    */
-  _formSubmit(e) {
+  async _formSubmit(e) {
     e.preventDefault();
     const detail = this._computeEventDetail();
-
-    this.dispatchEvent(new CustomEvent('save-request', {
+    const ev = new CustomEvent('save-request', {
       bubbles: true,
       composed: true,
       cancelable: true,
       detail
-    }));
+    });
+    this.dispatchEvent(ev);
+    this._saving = true;
+    await e.detail.result;
+    this._saving = false;
   }
   /**
    * Computes `save-request` custom event's `detail` object
@@ -307,16 +379,13 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(
   _computeEventDetail() {
     const storeRequest = Object.assign({}, this.request);
     storeRequest.name = this.name;
-    if (this.description) {
-      storeRequest.description = this.description;
-    }
-    if (!this.override && storeRequest._id) {
+    storeRequest.description = this.description;
+    if (!this._override && storeRequest._id) {
       delete storeRequest._id;
       delete storeRequest._rev;
     }
     const info = this._processSelectedProjectsInfo(this.selectedProjects);
     storeRequest.projects = info.existing;
-
     const storeOptions = {
       isDrive: this.isDrive
     };
@@ -346,17 +415,23 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(
     return history ? false : !!request._rev;
   }
 
-  _requestChanged(request, projects) {
+  _requestChanged(request) {
     if (!request) {
       this.reset();
       return;
     }
+
     const history = this.isHistory || request.type === 'history';
     const isDrive = history ? false : !!request.driveId;
 
-    this.set('name', request.name || '');
-    this.set('description', request.description || '');
-    this.set('isDrive', isDrive);
+    this.name = request.name || '';
+    this.description = request.description || '';
+    this.isDrive = isDrive;
+    this._restoreProjects(request);
+  }
+
+  _restoreProjects(request) {
+    const projects = this.projects || [];
     let projectIds = [];
     if (request.legacyProject) {
       projectIds[projectIds.length] = request.legacyProject;
@@ -366,7 +441,7 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(
     }
     const projectsLen = (projects && projects.length);
     if (projectsLen) {
-      let projectsData = [];
+      const projectsData = [];
       projectIds.forEach((id) => {
         for (let i = 0; i < projectsLen; i++) {
           if (projects[i]._id === id) {
@@ -376,22 +451,9 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(
         }
         projectsData[projectsData.length] = id;
       });
-      this.set('selectedProjects', projectsData.length ? projectsData : undefined);
+      this.selectedProjects = projectsData.length ? projectsData : undefined;
     } else {
-      this.set('selectedProjects', projectIds.length ? projectIds : undefined);
-    }
-  }
-  /**
-   * Notifies resize when the height of autogrow textarea changes.
-   */
-  _autogrowCheckResize() {
-    if (!this._lastAutogrowHeight) {
-      this._lastAutogrowHeight = this.$.autogrow.offsetHeight;
-      return;
-    }
-    if (this._lastAutogrowHeight !== this.$.autogrow.offsetHeight) {
-      this._lastAutogrowHeight = this.$.autogrow.offsetHeight;
-      this.notifyResize();
+      this.selectedProjects = projectIds.length ? projectIds : undefined;
     }
   }
 
@@ -399,6 +461,22 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(
     e.stopPropagation();
   }
 
+  _inputChanged(e) {
+    const { name, value } = e.target;
+    this[name] = value;
+  }
+
+  _projectsHandler(e) {
+    this.selectedProjects = e.detail.value;
+  }
+
+  _isDriveHandler(e) {
+    this.isDrive = e.detail.value;
+  }
+
+  _editorValueChanged(e) {
+    this.description = e.detail.value;
+  }
   /**
    * Fired when the user cancels the editor.
    * @event cancel-request-edit

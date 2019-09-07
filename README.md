@@ -7,7 +7,11 @@
 
 # saved-request-editor
 
-An applet to edit saved request data.
+An applet to edit saved request data. The element appears in a context of a request editor or requests list.
+
+It provides an UI to edit request metadata, but not HTTP request values.
+
+The element dispatches bubbling `save-request` event that is handled by `request-model` which processes store request. This is preferred way of storing request data in ARC.
 
 ## Example:
 
@@ -15,65 +19,53 @@ An applet to edit saved request data.
 <saved-request-editor></saved-request-editor>
 ```
 
-## API components
-
-This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)
-
 ## Usage
 
 ### Installation
 ```
 npm install --save @advanced-rest-client/saved-request-editor
 ```
-
-### In an html file
-
-```html
-<html>
-  <head>
-    <script type="module">
-      import './node_modules/@advanced-rest-client/saved-request-editor/saved-request-editor.js';
-    </script>
-  </head>
-  <body>
-    <saved-request-editor></saved-request-editor>
-  </body>
-</html>
-```
-
-### In a Polymer 3 element
+### In a LitElement
 
 ```js
-import {PolymerElement, html} from './node_modules/@polymer/polymer/polymer-element.js';
+import { LitElement, html } from 'lit-element';
 import './node_modules/@advanced-rest-client/saved-request-editor/saved-request-editor.js';
 
-class SampleElement extends PolymerElement {
-  static get template() {
+class SampleElement extends LitElement {
+  render() {
     return html`
-    <saved-request-editor></saved-request-editor>
+    <saved-request-editor
+      .request="${this.request}"
+      @cancel="${this._onCancel}"
+      @save-request="${this._onSave}"></saved-request-editor>
     `;
+  }
+
+  _onCancel() {
+    ...
+  }
+
+  _onSave() {
+    ...
   }
 }
 customElements.define('sample-element', SampleElement);
 ```
 
-### Installation
+## Development
 
 ```sh
 git clone https://github.com/advanced-rest-client/saved-request-editor
-cd api-url-editor
+cd saved-request-editor
 npm install
-npm install -g polymer-cli
-```
-
-### Running the demo locally
-
-```sh
-polymer serve --npm
-open http://127.0.0.1:<port>/demo/
 ```
 
 ### Running the tests
+
 ```sh
-polymer test --npm
+npm test
 ```
+
+## API components
+
+This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)
