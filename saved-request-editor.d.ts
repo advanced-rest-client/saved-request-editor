@@ -5,28 +5,18 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   saved-request-editor.html
+ *   saved-request-editor.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../polymer/types/lib/elements/dom-if.d.ts" />
-/// <reference path="../polymer/types/lib/legacy/class.d.ts" />
-/// <reference path="../iron-resizable-behavior/iron-resizable-behavior.d.ts" />
-/// <reference path="../iron-flex-layout/iron-flex-layout.d.ts" />
-/// <reference path="../paper-checkbox/paper-checkbox.d.ts" />
-/// <reference path="../paper-input/paper-input.d.ts" />
-/// <reference path="../paper-input/paper-textarea.d.ts" />
-/// <reference path="../paper-button/paper-button.d.ts" />
-/// <reference path="../paper-chip-input/paper-chip-input.d.ts" />
-/// <reference path="../iron-form/iron-form.d.ts" />
-/// <reference path="../iron-collapse/iron-collapse.d.ts" />
-/// <reference path="../paper-icon-button/paper-icon-button.d.ts" />
-/// <reference path="../arc-icons/arc-icons.d.ts" />
-/// <reference path="../projects-list-consumer-mixin/projects-list-consumer-mixin.d.ts" />
+import {SavedRequestDetail} from '@advanced-rest-client/saved-request-detail';
+
+import {html, css} from 'lit-element';
+
+import {ProjectsListConsumerMixin} from '@advanced-rest-client/projects-list-consumer-mixin/projects-list-consumer-mixin.js';
 
 declare namespace UiElements {
 
@@ -68,17 +58,8 @@ declare namespace UiElements {
    */
   class SavedRequestEditor extends
     Polymer.IronResizableBehavior(
-    ArcComponents.ProjectsListConsumerMixin(
+    ProjectsListConsumerMixin(
     Object)) {
-
-    /**
-     * The request object to be saved / updated in the datastore.
-     * It's not required for the editor to work.
-     * This object will be attached to `save-request` object as a reference.
-     * When this object change it computes values for `name`, `isSaved`,
-     * `isDrive`, `projectName` and `projectId` properties.
-     */
-    request: object|null|undefined;
 
     /**
      * Name of the request.
@@ -91,12 +72,6 @@ declare namespace UiElements {
     description: string|null|undefined;
 
     /**
-     * Should be set if the request has been already saved in the datastore.
-     * Adds UI controls to override or save as new.
-     */
-    readonly isSaved: boolean|null|undefined;
-
-    /**
      * True when saving request to Google Drive.
      */
     isDrive: boolean|null|undefined;
@@ -104,7 +79,7 @@ declare namespace UiElements {
     /**
      * Set if the user chooses to override current request.
      */
-    readonly override: boolean|null|undefined;
+    _override: boolean|null|undefined;
 
     /**
      * True when additional options are opened.
@@ -115,7 +90,17 @@ declare namespace UiElements {
      * List of selected in the dialog project names.
      */
     selectedProjects: Array<String|null>|null;
+    _saving: boolean|null|undefined;
+    _titleTemplate(): any;
+    _descriptionTemplate(): any;
+    _projectsTemplate(): any;
+    _additionalActionsTemplate(): any;
+    _actionsTemplate(): any;
+    render(): any;
     connectedCallback(): void;
+    disconnectedCallback(): void;
+    _projectsChanged(): void;
+    _requestChangedHandler(e: any): void;
 
     /**
      * Resets the state of the UI
@@ -123,7 +108,7 @@ declare namespace UiElements {
     reset(): void;
 
     /**
-     * Sends the `cancel-request-edit` custom event to cancel the edit.
+     * Sends the `cancel` custom event to cancel the edit.
      */
     _cancel(): void;
 
@@ -135,7 +120,7 @@ declare namespace UiElements {
     /**
      * Sets `override` to `true` and sends the form.
      */
-    _override(): void;
+    _overrideHandler(): void;
 
     /**
      * Validates and submits the form.
@@ -145,7 +130,7 @@ declare namespace UiElements {
     /**
      * Sends the `save-request` custom event with computed detail object.
      */
-    _formSubmit(e: CustomEvent|null): void;
+    _formSubmit(e: CustomEvent|null): any;
 
     /**
      * Computes `save-request` custom event's `detail` object
@@ -161,16 +146,19 @@ declare namespace UiElements {
      * @param request Request object assigned to the `request`
      */
     _computeIsSaved(request: object|null): Boolean|null;
-    _requestChanged(request: any, projects: any): void;
-
-    /**
-     * Notifies resize when the height of autogrow textarea changes.
-     */
-    _autogrowCheckResize(): void;
+    _requestChanged(request: any): void;
+    _restoreProjects(request: any): void;
     _stopEvent(e: any): void;
+    _inputChanged(e: any): void;
+    _projectsHandler(e: any): void;
+    _isDriveHandler(e: any): void;
+    _editorValueChanged(e: any): void;
   }
 }
 
-interface HTMLElementTagNameMap {
-  "saved-request-editor": UiElements.SavedRequestEditor;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "saved-request-editor": UiElements.SavedRequestEditor;
+  }
 }
