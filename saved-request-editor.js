@@ -118,7 +118,7 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDetail) {
   }
 
   _titleTemplate() {
-    const { name, compatibility } = this;
+    const { name, compatibility, outlined } = this;
     return html`
     <anypoint-input
       required
@@ -127,7 +127,9 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDetail) {
       .value="${name}"
       name="name"
       @input="${this._inputChanged}"
-      ?compatibility="${compatibility}">
+      ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
+    >
       <label slot="label">Request name (required)</label>
     </anypoint-input>
     `;
@@ -276,7 +278,15 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDetail) {
        */
       selectedProjects: { type: Array },
 
-      _saving: { type: Boolean }
+      _saving: { type: Boolean },
+      /**
+       * Enables compatibility with Anypoint platform
+       */
+      compatibility: { type: Boolean },
+      /**
+       * Enables material's outlined theme for inputs.
+       */
+      outlined: { type: Boolean },
     };
   }
 

@@ -1,7 +1,7 @@
 {
   "name": "@advanced-rest-client/saved-request-editor",
   "description": "An applet to edit saved request data",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "license": "Apache-2.0",
   "main": "saved-request-editor.js",
   "keywords": [
