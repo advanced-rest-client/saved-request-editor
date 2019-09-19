@@ -487,6 +487,14 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDetail) {
   _editorValueChanged(e) {
     this.description = e.detail.value;
   }
+
+  notifyResize() {
+    super.notifyResize();
+    const cm = this.shadowRoot.querySelector('#cm');
+    if (cm) {
+      cm.refresh();
+    }
+  }
   /**
    * Fired when the user cancels the editor.
    * @event cancel-request-edit
