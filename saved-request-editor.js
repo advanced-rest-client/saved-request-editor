@@ -21,8 +21,7 @@ import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
 import '@anypoint-web-components/anypoint-chip-input/anypoint-chip-input.js';
 import '@polymer/iron-form/iron-form.js';
 import '@polymer/iron-collapse/iron-collapse.js';
-import '@advanced-rest-client/arc-icons/arc-icons.js';
-import '@polymer/iron-icon/iron-icon.js';
+import { arrowDropDown } from '@advanced-rest-client/arc-icons/ArcIcons.js';
 import '@advanced-rest-client/code-mirror/code-mirror.js';
 import { ProjectsListConsumerMixin } from
   '@advanced-rest-client/projects-list-consumer-mixin/projects-list-consumer-mixin.js';
@@ -99,6 +98,13 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDetail) {
 
       [data-caption-opened] .caption-icon {
         transform: rotate(-180deg);
+      }
+
+      .icon {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
       }
 
       .options {
@@ -181,8 +187,9 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDetail) {
         <anypoint-icon-button
           ?compatibility="${compatibility}"
           class="caption-icon"
-          aria-label="Activate to toggle additional options">
-          <iron-icon icon="arc:arrow-drop-down"></iron-icon>
+          aria-label="Activate to toggle additional options"
+        >
+          <span class="icon">${arrowDropDown}</span>
         </anypoint-icon-button>
       </div>
       <iron-collapse .opened="${additionalOptionsOpened}">

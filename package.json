@@ -37,7 +37,6 @@
     "@anypoint-web-components/anypoint-input": "^0.2.6",
     "@polymer/iron-collapse": "^3.0.0",
     "@polymer/iron-form": "^3.0.0",
-    "@polymer/iron-icon": "^3.0.1",
     "lit-element": "^2.2.1"
   },
   "devDependencies": {
