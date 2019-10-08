@@ -163,7 +163,6 @@ class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDetail) {
     return html`<anypoint-chip-input
       .chipsValue="${selectedProjects}"
       .source="${source}"
-      chipremoveicon="arc:close"
       @overlay-opened="${this._stopEvent}"
       @overlay-closed="${this._stopEvent}"
       @chips-changed="${this._projectsHandler}"
