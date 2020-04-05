@@ -1,7 +1,6 @@
 import { fixture, assert, html, nextFrame } from '@open-wc/testing';
 import * as sinon from 'sinon';
 import { DataGenerator } from '@advanced-rest-client/arc-data-generator/arc-data-generator.js';
-// import * as MockInteractions from '@polymer/iron-test-helpers/mock-interactions.js';
 import '../saved-request-editor.js';
 
 describe('<saved-request-editor>', function() {
@@ -555,12 +554,17 @@ describe('<saved-request-editor>', function() {
   describe('a11y', () => {
     it('is accessible with new request', async () => {
       const element = await newRequestProjectsFixture();
-      await assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        // implementations should handle colors
+        ignoredRules: ['color-contrast']
+      });
     });
 
     it('is accessible with saved request', async () => {
       const element = await existingRequestFixture();
-      await assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast']
+      });
     });
   });
 });

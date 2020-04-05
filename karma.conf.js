@@ -13,14 +13,8 @@ module.exports = (config) => {
         // npm run test -- --grep test/bar/*
         {
           pattern: config.grep ? config.grep : 'test/**/*.test.js',
-          type: 'module'
+          type: 'module',
         },
-        {
-          pattern: require.resolve('chai/chai.js')
-        },
-        {
-          pattern: require.resolve('axe-core/axe.min.js')
-        }
       ],
 
       // see the karma-esm docs for all options
