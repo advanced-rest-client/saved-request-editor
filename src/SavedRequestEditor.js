@@ -174,7 +174,9 @@ export class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDe
       title="Replaces request data"
       aria-label="Activate to update the request"
       ?compatibility="${this.compatibility}"
-      ?disabled="${_saving}">
+      ?disabled="${_saving}"
+      emphasis="high"
+    >
       Update
     </anypoint-button>` : html`<anypoint-button
       class="action-button"
