@@ -1,5 +1,5 @@
 import { html } from 'lit-html';
-import { ArcDemoPage } from '@advanced-rest-client/arc-demo-helper/ArcDemoPage.js';
+import { DemoPage } from '@advanced-rest-client/arc-demo-helper';
 import '@anypoint-web-components/anypoint-button/anypoint-button.js';
 import '@advanced-rest-client/arc-demo-helper/arc-interactive-demo.js';
 import '@advanced-rest-client/saved-menu/saved-menu.js';
@@ -12,40 +12,19 @@ import '../saved-request-editor.js';
 
 /* global chance */
 
-class DemoPage extends ArcDemoPage {
+class ComponentDemo extends DemoPage {
   constructor() {
     super();
     this.initObservableProperties([
-      'compatibility',
       'request'
     ]);
-    this._componentName = 'saved-request-editor';
-    this.demoStates = ['Material Design', 'Anypoint'];
+    this.componentName = 'saved-request-editor';
 
-    this._demoStateHandler = this._demoStateHandler.bind(this);
-    this._toggleMainOption = this._toggleMainOption.bind(this);
     this.generateData = this.generateData.bind(this);
     this.deleteData = this.deleteData.bind(this);
     this._selectRequest = this._selectRequest.bind(this);
 
     window.addEventListener('google-drive-data-save', this._exportDriveHandler);
-  }
-
-  _toggleMainOption(e) {
-    const { name, checked } = e.target;
-    this[name] = checked;
-  }
-
-  _demoStateHandler(e) {
-    const state = e.detail.value;
-    switch (state) {
-      case 0:
-        this.compatibility = false;
-        break;
-      case 1:
-        this.compatibility = true;
-        break;
-    }
   }
 
   _listTypeHandler(e) {
@@ -123,7 +102,7 @@ class DemoPage extends ArcDemoPage {
       <section class="documentation-section">
         <h3>Interactive demo</h3>
         <p>
-          This demo lets you preview the history menu element with various
+          This demo lets you preview the saved-request-editor element with various
           configuration options.
         </p>
 
@@ -173,7 +152,7 @@ class DemoPage extends ArcDemoPage {
       <section class="documentation-section">
         <h3>Introduction</h3>
         <p>
-          Advanced REST Client saved request is a dialog that renders request details.
+          Advanced REST Client saved request editor is a dialog that renders saved request editr.
           It is styled for material design lists with compatibility with
           Anypoint platform.
         </p>
@@ -198,7 +177,7 @@ class DemoPage extends ArcDemoPage {
 
   contentTemplate() {
     return html`
-      <h2>ARC history menu</h2>
+      <h2>ARC saved request editor</h2>
       <project-model></project-model>
       <request-model></request-model>
       ${this._demoTemplate()}
@@ -208,6 +187,6 @@ class DemoPage extends ArcDemoPage {
   }
 }
 
-const instance = new DemoPage();
+const instance = new ComponentDemo();
 instance.render();
 window._demo = instance;
