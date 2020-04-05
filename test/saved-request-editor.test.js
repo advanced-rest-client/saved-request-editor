@@ -1,5 +1,5 @@
 import { fixture, assert, html, nextFrame } from '@open-wc/testing';
-import * as sinon from 'sinon/pkg/sinon-esm.js';
+import * as sinon from 'sinon';
 import { DataGenerator } from '@advanced-rest-client/arc-data-generator/arc-data-generator.js';
 // import * as MockInteractions from '@polymer/iron-test-helpers/mock-interactions.js';
 import '../saved-request-editor.js';
@@ -132,6 +132,23 @@ describe('<saved-request-editor>', function() {
       const node = getActionItem(element, 'save-request');
       node.click();
       assert.isTrue(spy.calledOnce);
+    });
+  });
+
+  describe('#isSavedRequest', () => {
+    it('returns false when no request', async () => {
+      const element = await basicFixture();
+      assert.isFalse(element.isSavedRequest);
+    });
+
+    it('returns false when no saved request', async () => {
+      const element = await newRequestFixture();
+      assert.isFalse(element.isSavedRequest);
+    });
+
+    it('returns true when saved request', async () => {
+      const element = await existingRequestFixture();
+      assert.isTrue(element.isSavedRequest);
     });
   });
 

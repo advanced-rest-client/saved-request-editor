@@ -75,136 +75,6 @@ export class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDe
     ];
   }
 
-  _titleTemplate() {
-    const { name, compatibility, outlined } = this;
-    return html`
-    <anypoint-input
-      required
-      autovalidate
-      invalidmessage="Name is required"
-      .value="${name}"
-      name="name"
-      @input="${this._inputChanged}"
-      ?compatibility="${compatibility}"
-      ?outlined="${outlined}"
-    >
-      <label slot="label">Request name (required)</label>
-    </anypoint-input>
-    `;
-  }
-
-  _descriptionTemplate() {
-    const { description } = this;
-    return html`
-    <div class="cm-wrap">
-      <label for="cm">Description (markdown)</label>
-      <code-mirror
-        id="cm"
-        mode="markdown"
-        .value="${description}"
-        @value-changed="${this._editorValueChanged}"
-        gutters='["CodeMirror-lint-markers"]'
-        lineNumbers></code-mirror>
-    </div>`;
-  }
-
-  _projectsTemplate() {
-    const { compatibility, selectedProjects, projects } = this;
-    const source = this._computeProjectsAutocomplete(projects);
-    return html`<anypoint-chip-input
-      .chipsValue="${selectedProjects}"
-      .source="${source}"
-      @overlay-opened="${this._stopEvent}"
-      @overlay-closed="${this._stopEvent}"
-      @chips-changed="${this._projectsHandler}"
-      ?compatibility="${compatibility}">
-      <label slot="label">Add to project</label>
-    </anypoint-chip-input>`;
-  }
-
-  _additionalActionsTemplate() {
-    const { additionalOptionsOpened, compatibility, isDrive } = this;
-    return html`<section class="additional-options">
-      <div class="caption"
-        @click="${this._toggleOptions}"
-        ?data-caption-opened="${additionalOptionsOpened}">
-        Additional options
-        <anypoint-icon-button
-          ?compatibility="${compatibility}"
-          class="caption-icon"
-          aria-label="Activate to toggle additional options"
-        >
-          <span class="icon">${arrowDropDown}</span>
-        </anypoint-icon-button>
-      </div>
-      <iron-collapse .opened="${additionalOptionsOpened}">
-        <div class="options">
-          <anypoint-checkbox
-            .checked="${isDrive}"
-            @checked-changed="${this._isDriveHandler}">Save to Google Drive</anypoint-checkbox>
-        </div>
-      </iron-collapse>
-    </section>`;
-  }
-
-  _actionsTemplate() {
-    const isSaved = this._computeIsSaved(this.request);
-    const { _saving } = this;
-    return html`
-    <anypoint-button
-      @click="${this._cancel}"
-      data-action="cancel-edit"
-      title="Cancels any changes"
-      aria-label="Activate to cancel editor"
-      ?compatibility="${this.compatibility}">
-      Cancel
-    </anypoint-button>
-    ${isSaved ? html`<anypoint-button
-      @click="${this._save}"
-      data-action="save-as-new"
-      title="Saves request as new object"
-      aria-label="Activate to save request as new object"
-      ?compatibility="${this.compatibility}"
-      ?disabled="${_saving}">
-      Save as new
-    </anypoint-button>
-    <anypoint-button
-      @click="${this._overrideHandler}"
-      data-action="override"
-      title="Replaces request data"
-      aria-label="Activate to update the request"
-      ?compatibility="${this.compatibility}"
-      ?disabled="${_saving}"
-      emphasis="high"
-    >
-      Update
-    </anypoint-button>` : html`<anypoint-button
-      class="action-button"
-      @click="${this._save}"
-      data-action="save-request"
-      title="Commits changes and stores request in data store"
-      aria-label="Activate to save the request"
-      ?compatibility="${this.compatibility}"
-      ?disabled="${_saving}">Save</anypoint-button>`}
-    `;
-  }
-
-  render() {
-    return html`
-    <iron-form id="form" @iron-form-presubmit="${this._formSubmit}">
-      <form method="post">
-        ${this._modelTemplate()}
-        ${this._titleTemplate()}
-        ${this._projectsTemplate()}
-        ${this._descriptionTemplate()}
-        ${this._additionalActionsTemplate()}
-      </form>
-    </iron-form>
-    <div class="actions">
-      ${this._actionsTemplate()}
-    </div>`;
-  }
-
   static get properties() {
     return {
       /**
@@ -256,6 +126,19 @@ export class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDe
     }
     this._selectedProjects = value;
     this.requestUpdate();
+  }
+
+  /**
+   * Computes value for `isSaved` property.
+   * @return {Boolean}
+   */
+  get isSavedRequest() {
+    const { request } = this;
+    if (!request) {
+      return false;
+    }
+    const history = !!(request && request.type === 'history');
+    return history ? false : !!request._rev;
   }
 
   constructor() {
@@ -380,18 +263,6 @@ export class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDe
   _toggleOptions() {
     this.additionalOptionsOpened = !this.additionalOptionsOpened;
   }
-  /**
-   * Computes value for `isSaved` property.
-   * @param {?Object} request Request object assigned to the `request`
-   * @return {Boolean}
-   */
-  _computeIsSaved(request) {
-    if (!request) {
-      return false;
-    }
-    const history = !!(request && request.type === 'history');
-    return history ? false : !!request._rev;
-  }
 
   _requestChanged(request) {
     if (!request) {
@@ -463,6 +334,148 @@ export class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDe
       cm.refresh();
     }
   }
+
+  _titleTemplate() {
+    const { name, compatibility, outlined } = this;
+    return html`
+    <anypoint-input
+      required
+      autovalidate
+      invalidmessage="Name is required"
+      .value="${name}"
+      name="name"
+      @input="${this._inputChanged}"
+      ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
+    >
+      <label slot="label">Request name (required)</label>
+    </anypoint-input>
+    `;
+  }
+
+  _descriptionTemplate() {
+    const { description } = this;
+    return html`
+    <div class="cm-wrap">
+      <label for="cm">Description (markdown)</label>
+      <code-mirror
+        id="cm"
+        mode="markdown"
+        .value="${description}"
+        @value-changed="${this._editorValueChanged}"
+        gutters='["CodeMirror-lint-markers"]'
+        lineNumbers></code-mirror>
+    </div>`;
+  }
+
+  _projectsTemplate() {
+    const { compatibility, selectedProjects, projects } = this;
+    const source = this._computeProjectsAutocomplete(projects);
+    return html`<anypoint-chip-input
+      .chipsValue="${selectedProjects}"
+      .source="${source}"
+      @overlay-opened="${this._stopEvent}"
+      @overlay-closed="${this._stopEvent}"
+      @chips-changed="${this._projectsHandler}"
+      ?compatibility="${compatibility}">
+      <label slot="label">Add to project</label>
+    </anypoint-chip-input>`;
+  }
+
+  _additionalActionsTemplate() {
+    const { additionalOptionsOpened, compatibility, isDrive } = this;
+    return html`<section class="additional-options">
+      <div class="caption"
+        @click="${this._toggleOptions}"
+        ?data-caption-opened="${additionalOptionsOpened}">
+        Additional options
+        <anypoint-icon-button
+          ?compatibility="${compatibility}"
+          class="caption-icon"
+          aria-label="Activate to toggle additional options"
+        >
+          <span class="icon">${arrowDropDown}</span>
+        </anypoint-icon-button>
+      </div>
+      <iron-collapse .opened="${additionalOptionsOpened}">
+        <div class="options">
+          <anypoint-checkbox
+            .checked="${isDrive}"
+            @checked-changed="${this._isDriveHandler}">Save to Google Drive</anypoint-checkbox>
+        </div>
+      </iron-collapse>
+    </section>`;
+  }
+
+  _actionsTemplate() {
+    const { isSavedRequest } = this;
+    return html`
+    <anypoint-button
+      @click="${this._cancel}"
+      data-action="cancel-edit"
+      title="Cancels any changes"
+      aria-label="Activate to cancel editor"
+      ?compatibility="${this.compatibility}">
+      Cancel
+    </anypoint-button>
+    ${isSavedRequest ? this._savedActionsTemplate() : this._unsavedActionsTemplate()}
+    `;
+  }
+
+  _savedActionsTemplate() {
+    const { _saving, compatibility } = this;
+    return html`<anypoint-button
+      @click="${this._save}"
+      data-action="save-as-new"
+      title="Saves request as new object"
+      aria-label="Activate to save request as new object"
+      ?compatibility="${compatibility}"
+      ?disabled="${_saving}"
+    >
+      Save as new
+    </anypoint-button>
+    <anypoint-button
+      @click="${this._overrideHandler}"
+      data-action="override"
+      title="Replaces request data"
+      aria-label="Activate to update the request"
+      ?compatibility="${compatibility}"
+      ?disabled="${_saving}"
+      emphasis="high"
+    >
+      Update
+    </anypoint-button>`;
+  }
+
+  _unsavedActionsTemplate() {
+    const { _saving, compatibility } = this;
+    return html`<anypoint-button
+      class="action-button"
+      @click="${this._save}"
+      data-action="save-request"
+      title="Commits changes and stores request in data store"
+      aria-label="Activate to save the request"
+      ?compatibility="${compatibility}"
+      ?disabled="${_saving}"
+    >Save</anypoint-button>`;
+  }
+
+  render() {
+    return html`
+    <iron-form id="form" @iron-form-presubmit="${this._formSubmit}">
+      <form method="post">
+        ${this._modelTemplate()}
+        ${this._titleTemplate()}
+        ${this._projectsTemplate()}
+        ${this._descriptionTemplate()}
+        ${this._additionalActionsTemplate()}
+      </form>
+    </iron-form>
+    <div class="actions">
+      ${this._actionsTemplate()}
+    </div>`;
+  }
+
   /**
    * Fired when the user cancels the editor.
    * @event cancel-request-edit
