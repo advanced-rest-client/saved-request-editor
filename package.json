@@ -51,7 +51,6 @@
     "@open-wc/testing": "^2.5.9",
     "@open-wc/testing-karma": "^3.3.11",
     "@polymer/gen-typescript-declarations": "^1.6.2",
-    "@polymer/paper-toggle-button": "^3.0.1",
     "deepmerge": "^4.2.2",
     "es-dev-server": "^1.46.1",
     "husky": "^4.2.3",
