@@ -241,6 +241,21 @@ export class SavedRequestEditor extends ProjectsListConsumerMixin(SavedRequestDe
     };
   }
 
+  get selectedProjects() {
+    return this._selectedProjects;
+  }
+
+  set selectedProjects(value) {
+    const old = this._selectedProjects;
+    const oldSerialized = Array.isArray(old) ? JSON.stringify(old) : '';
+    const thisStringified = Array.isArray(value) ? JSON.stringify(value) : '';
+    if (oldSerialized === thisStringified) {
+      return;
+    }
+    this._selectedProjects = value;
+    this.requestUpdate();
+  }
+
   constructor() {
     super();
     this._projectsChanged = this._projectsChanged.bind(this);
